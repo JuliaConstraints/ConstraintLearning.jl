@@ -8,9 +8,9 @@ uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
 [[deps.ArrayInterface]]
 deps = ["IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
-git-tree-sha1 = "019303a0f26d6012f35ecdfa4618551d145fb9f2"
+git-tree-sha1 = "d84c956c4c0548b4caf0e4e96cf5b6494b5b1529"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "3.1.31"
+version = "3.1.32"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -38,9 +38,9 @@ version = "0.9.1"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "30ee06de5ff870b45c78f529a6b093b3323256a3"
+git-tree-sha1 = "4ce9393e871aca86cc457d9f66976c3da6902ea7"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.3.1"
+version = "1.4.0"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -62,19 +62,17 @@ version = "0.3.0"
 
 [[deps.Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "6071cb87be6a444ac75fdbf51b8e7273808ce62f"
+git-tree-sha1 = "4866e381721b30fac8dda4c8cb1d9db45c8d2994"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.35.0"
+version = "3.37.0"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 
 [[deps.CompositionalNetworks]]
-deps = ["ConstraintDomains", "Dictionaries", "Evolutionary", "JuliaFormatter", "OrderedCollections", "Random", "ThreadPools", "Unrolled"]
-git-tree-sha1 = "e0f6f786157399739a2670ce7c1c7e378fa22df7"
-repo-rev = "xp"
-repo-url = "https://github.com/JuliaConstraints/CompositionalNetworks.jl.git"
+deps = ["ConstraintDomains", "Dictionaries", "Evolutionary", "JuliaFormatter", "Memoization", "OrderedCollections", "Random", "ThreadPools", "ThreadSafeDicts", "Unrolled"]
+path = "C:\\Users\\jeanf\\.julia\\dev\\CompositionalNetworks"
 uuid = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
 version = "0.2.7"
 
@@ -153,9 +151,9 @@ uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[deps.DrWatson]]
 deps = ["Dates", "FileIO", "LibGit2", "MacroTools", "Pkg", "Random", "Requires", "UnPack"]
-git-tree-sha1 = "023a12e0004225f5b6860f94f3c0df5e485f54b4"
+git-tree-sha1 = "6e4bef7d8b136074f38862e0c5f7e8b04727d95d"
 uuid = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
-version = "2.4.1"
+version = "2.4.2"
 
 [[deps.Evolutionary]]
 deps = ["LinearAlgebra", "NLSolversBase", "Random", "Statistics", "UnPack"]
@@ -229,9 +227,9 @@ version = "0.21.2"
 
 [[deps.JuliaFormatter]]
 deps = ["CSTParser", "CommonMark", "DataStructures", "Pkg", "Tokenize"]
-git-tree-sha1 = "10c95cebcfa37c1f510a726c90886db4745e1238"
+git-tree-sha1 = "e73c7d579f080362dfa7af909fb13865b886bc79"
 uuid = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
-version = "0.15.11"
+version = "0.16.0"
 
 [[deps.Lazy]]
 deps = ["MacroTools"]
@@ -273,9 +271,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
-git-tree-sha1 = "0fb723cd8c45858c22169b2e42269e53271a6df7"
+git-tree-sha1 = "5a5bc6bf062f0f95e62d0fe0a2d99699fed82dd9"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.7"
+version = "0.5.8"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -284,6 +282,12 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+
+[[deps.Memoization]]
+deps = ["MacroTools"]
+git-tree-sha1 = "42d48cac95e0fee730ba2fff477adc68c52c65f4"
+uuid = "6fafb56a-5788-4b4e-91ca-c0cea6611c73"
+version = "0.1.13"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -402,9 +406,9 @@ version = "1.6.1"
 
 [[deps.Static]]
 deps = ["IfElse"]
-git-tree-sha1 = "854b024a4a81b05c0792a4b45293b85db228bd27"
+git-tree-sha1 = "a8f30abc7c64a39d389680b74e749cf33f872a70"
 uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
-version = "0.3.1"
+version = "0.3.3"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
@@ -445,6 +449,12 @@ deps = ["Printf", "RecipesBase", "Statistics"]
 git-tree-sha1 = "47885d07fc68cf4f0eb7fcb3e2ad74765f91bed8"
 uuid = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 version = "2.0.1"
+
+[[deps.ThreadSafeDicts]]
+deps = ["Distributed"]
+git-tree-sha1 = "f9dd17de65a737450645e568ae050cd75f31ac59"
+uuid = "4239201d-c60e-5e0a-9702-85d713665ba7"
+version = "0.0.6"
 
 [[deps.Tokenize]]
 git-tree-sha1 = "0952c9cee34988092d73a5708780b3917166a0dd"

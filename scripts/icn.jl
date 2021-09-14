@@ -64,6 +64,7 @@ function icn_benchmark_unit(params)
             pop=params[:population],
             sampling=params[:sampling],
             search=string(params[:search]),
+            mem=params[:memoize],
         ),
         "json",
     )
@@ -86,8 +87,8 @@ function icn_benchmark_unit(params)
         metric = params[:metric]
         domain_size = params[:domains_size]
         domains = fill(domain(1:domain_size), domain_size)
-        func_name = "icn" * string(constraint_concept)[8:end] * "_" * string(metric)
-        func_path = datadir("compositions", func_name * ".jl")
+        # func_name = "icn" * string(constraint_concept)[8:end] * "_" * string(metric)
+        # func_path = datadir("compositions", func_name * ".jl")
 
         # Time the data retrieval/generation
         t = @timed search_space(
@@ -110,6 +111,7 @@ function icn_benchmark_unit(params)
             pop_size=params[:population],
             configurations=(solutions, non_sltns),
             sampler=params[:loss_sampler],
+            memoize=params[:memoize],
         )
         _, _, all_compos = bench.value
 
@@ -118,7 +120,13 @@ function icn_benchmark_unit(params)
         # Global results
         push!(results, :data => has_data ? :loaded : :explored)
         push!(results, :data_time => t.time)
+        push!(results, :data_bytes => t.bytes)
+        push!(results, :data_gctime => t.gctime)
+        push!(results, :data_gcstats => t.gcstats)
         push!(results, :icn_time => bench.time)
+        push!(results, :icn_bytes => bench.bytes)
+        push!(results, :icn_gctime => bench.gctime)
+        push!(results, :icn_gcstats => bench.gcstats)
         push!(results, :total_time => t.time + bench.time)
         push!(results, :nthreads => Threads.nthreads())
 
@@ -130,7 +138,12 @@ function icn_benchmark_unit(params)
 
             # Code composition
             for lang in (params[:language], :maths)
-                push!(local_results, lang => CompositionalNetworks.code(compo, lang))
+                push!(
+                    local_results,
+                    lang => CompositionalNetworks.code(
+                        compo, lang; name=string(params[:concept][1])
+                    ),
+                )
             end
             push!(local_results, :symbols => CompositionalNetworks.symbols(compo))
 
