@@ -32,9 +32,9 @@ version = "3.2.4"
 
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings"]
-git-tree-sha1 = "c907e91e253751f5840135f4c9deb1308273338d"
+git-tree-sha1 = "b8ea652d5c3932a473cf984614e5d826b209df8c"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.9.1"
+version = "0.9.2"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
@@ -72,7 +72,9 @@ uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 
 [[deps.CompositionalNetworks]]
 deps = ["ConstraintDomains", "Dictionaries", "Evolutionary", "JuliaFormatter", "Memoization", "OrderedCollections", "Random", "ThreadPools", "ThreadSafeDicts", "Unrolled"]
-path = "C:\\Users\\jeanf\\.julia\\dev\\CompositionalNetworks"
+git-tree-sha1 = "0f6632a24d680af5712a5841d0dff3bc5dd8fec9"
+repo-rev = "xp"
+repo-url = "https://github.com/JuliaConstraints/CompositionalNetworks.jl.git"
 uuid = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
 version = "0.2.7"
 
@@ -151,9 +153,9 @@ uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[deps.DrWatson]]
 deps = ["Dates", "FileIO", "LibGit2", "MacroTools", "Pkg", "Random", "Requires", "UnPack"]
-git-tree-sha1 = "6e4bef7d8b136074f38862e0c5f7e8b04727d95d"
+git-tree-sha1 = "d341997422e1b7cf49d66288aea5c838893e19a5"
 uuid = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
-version = "2.4.2"
+version = "2.4.3"
 
 [[deps.Evolutionary]]
 deps = ["LinearAlgebra", "NLSolversBase", "Random", "Statistics", "UnPack"]
@@ -262,9 +264,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "86197a8ecb06e222d66797b0c2d2f0cc7b69e42b"
+git-tree-sha1 = "34dc30f868e368f8a17b728a1238f3fcda43931a"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.2"
+version = "0.3.3"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
