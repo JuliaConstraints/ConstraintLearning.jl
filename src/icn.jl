@@ -1,25 +1,3 @@
-using Pkg
-Pkg.add("DrWatson")
-
-# Load DrWatson (scientific project manager)
-using DrWatson
-
-# Activate the ICNBenchmarks project
-@quickactivate "ICNBenchmarks"
-
-Pkg.instantiate()
-# Pkg.update()
-
-# Load common code to all script in ICNBenchmarks
-using ICNBenchmarks
-
-# Load other packages
-using BenchmarkTools
-using CompositionalNetworks
-using ConstraintDomains
-using Constraints
-using JSON
-
 function icn_benchmark_unit(params)
     @info "Running a benchmark unit with" params
 
@@ -87,8 +65,6 @@ function icn_benchmark_unit(params)
         metric = params[:metric]
         domain_size = params[:domains_size]
         domains = fill(domain(1:domain_size), domain_size)
-        # func_name = "icn" * string(constraint_concept)[8:end] * "_" * string(metric)
-        # func_path = datadir("compositions", func_name * ".jl")
 
         # Time the data retrieval/generation
         t = @timed search_space(
@@ -158,7 +134,7 @@ end
 
 function icn_benchmark(params=ALL_PARAMETERS; clear_results=false)
     # Ensure the folders for data output exist
-    clear_results && rm(datadir("compositions"); recursive=true, force=true)
+    clear_results && rm(datadir(); recursive=true, force=true)
     mkpath(datadir("compositions"))
 
     # Run all the benchmarks for all the unit configuration from params
@@ -166,10 +142,8 @@ function icn_benchmark(params=ALL_PARAMETERS; clear_results=false)
     @warn "Number of benchmark units is $(length(configs))"
     for (u, c) in enumerate(configs)
         @info "Starting the $u/$(length(configs)) benchmark unit"
+        GC.gc()
         icn_benchmark_unit(c)
     end
     return nothing
 end
-
-# NOTE - Please use clear_results=false for the real experiments
-icn_benchmark(; clear_results=true)
