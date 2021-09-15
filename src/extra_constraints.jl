@@ -7,13 +7,20 @@
 #     syms = Set([:permutable]),
 # )
 
-## no overlap
-function concept_no_overlap(x, l)
-    for i in 1:length(x), j in i+1:length(x)-1
-        x[i]+l[i] > x[j] && x[j]+l[j] > x[i] && return false
+## no overlap 1D and 2D (commented)
+function concept_no_overlap(x; param)
+    for i in 1:(length(x)-1), j in i:length(x)
+        x[i] + param > x[j] && x[j] + param > x[i] && return false
     end
     return true
 end
+
+# function concept_no_overlap(x; param::AbstractVector)
+#     for i in 1:(length(x)-1), j in i:length(x)
+#         x[i] + param[i] > x[j] && x[j] + param[j] > x[i] && return false
+#     end
+#     return true
+# end
 
 const no_overlap = Constraint(
     concept = concept_no_overlap,
@@ -21,3 +28,14 @@ const no_overlap = Constraint(
 )
 
 push!(BENCHED_CONSTRAINTS, :no_overlap => no_overlap)
+
+
+## Minimum
+concept_minimum(x; param) = minimum(x) < param
+
+const _minimum = Constraint(
+    concept = concept_no_overlap,
+    error = make_error(:minimum),
+)
+
+push!(BENCHED_CONSTRAINTS, :minimum => _minimum)
