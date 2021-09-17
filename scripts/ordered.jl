@@ -1,5 +1,3 @@
-include("../src/base_script.jl")
-
 ALL_PARAMETERS[:concept] = [(:ordered, nothing)]
 
 # NOTE - Please use clear_results=false (default) for the real experiments
