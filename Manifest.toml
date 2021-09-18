@@ -72,7 +72,9 @@ uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 
 [[deps.CompositionalNetworks]]
 deps = ["ConstraintDomains", "Dictionaries", "Evolutionary", "JuliaFormatter", "Memoization", "OrderedCollections", "Random", "ThreadPools", "ThreadSafeDicts", "Unrolled"]
-path = "C:\\Users\\jeanf\\.julia\\dev\\CompositionalNetworks"
+git-tree-sha1 = "1122b6fdb49dde4b2d110f5d6a83d4e5d6b6a015"
+repo-rev = "xp"
+repo-url = "https://github.com/JuliaConstraints/CompositionalNetworks.jl.git"
 uuid = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
 version = "0.2.7"
 
