@@ -6,6 +6,9 @@ using CompositionalNetworks
 using ConstraintDomains
 using Constraints
 using CSV
+using DataFrames
+using DataVoyager
+using Dictionaries
 using DrWatson
 using JSON
 using Tables
@@ -18,12 +21,15 @@ export ALL_PARAMETERS
 export BENCHED_CONSTRAINTS
 
 # others
-export search_space, icn_benchmark
+export analyze
+export icn_benchmark
+export search_space
 
 # includes
 include("constants.jl")
 include("search_space.jl")
 include("extra_constraints.jl")
 include("icn.jl")
+include("analyze.jl")
 
 end
