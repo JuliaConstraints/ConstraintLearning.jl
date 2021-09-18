@@ -3,7 +3,7 @@ if isempty(ARGS)
     @info "To view the list of available concepts, use julia main.jl -show_concepts"
 else
     if (ARGS[1] == "-show_concepts")
-        @info "Available concepts:\n" 
+        @info "Available concepts:\n"
         @info [concept[1:end-3] for concept in readdir() if concept!="main.jl"]
     else
         concept = ARGS[1]*".jl"
@@ -23,8 +23,6 @@ else
         end
 
         include(ARGS[1]*".jl")
-        
+
     end
 end
-
-
