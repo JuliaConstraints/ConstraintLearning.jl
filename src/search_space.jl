@@ -49,7 +49,7 @@ function search_space(
 
     function read_csv_as_set(file)
         configs = Set{Vector{Int}}()
-        for r in CSV.Rows(file; header=false, type=Int)
+        for r in CSV.Rows(file; header=false, types=Int)
             push!(configs, collect(Int, r))
         end
         return configs
