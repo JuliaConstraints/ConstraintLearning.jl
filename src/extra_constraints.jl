@@ -2,7 +2,7 @@
 # The list is based on https://arxiv.org/abs/2009.00514
 
 # SECTION - Generic constraints
-# intension: predicate over variables
+# intension: predicate over variables (DONE)
 # extension: supports or conflicts with a set of configurations
 
 # SECTION - Constraints defined from Languages
@@ -11,22 +11,21 @@
 
 # SECTION - Comparison-based Constraints
 # all_different: done in Constraints.jl
-# candidate: all_different_except
+# candidate: all_different_except (DONE)
 # all_equal: done in Constraints.jl
 # all_equal_param: done (not in XCSP3)
-# ordered: increasing (current ordered in Constraints.jl), strictly_increasing, decreasing, strictly_decreasing
+# ordered: increasing (current ordered in Constraints.jl), strictly_increasing (DONE), decreasing, strictly_decreasing
 
 # SECTION - Counting and Summing Constraints
-# sum or linear or linear_sum: sum_equal_param
-# candidate: more generic linear equation
+# sum or linear or linear_sum: sum_equal_param (DONE)
+# candidate: more generic linear equation (DONE)
 # count: count, among, at_least, at_most
 # n_values: n_values, at_least_n_values, at_most_n_values
 # candidate: n_values_except (ignores the values in except)
 # cardinality: (global_)cardinality
 
 # SECTION - Connection Constraints
-# maximum: all values lower than param
-
+# maximum: all values lower than param (DONE)
 
 # minimum
 concept_minimum(x; param) = minimum(x) < param
@@ -74,4 +73,56 @@ const no_overlap = Constraint(
 push!(BENCHED_CONSTRAINTS, :no_overlap => no_overlap)
 
 
-## Minimum
+## maximum
+concept_maximum(x; param) = maximum(x) < param
+
+const _maximum = Constraint(
+    concept = concept_maximum,
+    error = make_error(:maximum),
+)
+
+push!(BENCHED_CONSTRAINTS, :maximum => _maximum)
+
+## intension
+concept_intension(x; param::Function) = param(x)
+
+const _intension = Constraint(
+    concept = concept_intension,
+    error = make_error(:intension),
+)
+
+push!(BENCHED_CONSTRAINTS, :intension => _intension)
+
+## linear
+concept_linear(x1, op1::Function, x2, op2::Funcion, param) = op2(op1(x1,x2),param) 
+
+const _linear = Constraint(
+    concept = concept_linear,
+    error = make_error(:intension),
+)
+
+push!(BENCHED_CONSTRAINTS, :linear => _linear)
+
+## all_different_except
+
+concept_all_different_except(x, s) = allunique(filter(element -> element ∉ s , x))
+
+const _all_different_except = Constraint(
+    concept = concept_all_different_except,
+    error = make_error(:all_different_except),
+)
+
+push!(BENCHED_CONSTRAINTS, :all_different_except => _all_different_except)
+
+
+## strictly_increasing
+
+concept_strictly_increasing(x; param=nothing) = issorted(x) && length(x) == length(Set(x))
+
+const _strictly_increasing = Constraint(
+    concept = concept_strictly_increasing,
+    error = make_error(:strictly_increasing),
+)
+
+push!(BENCHED_CONSTRAINTS, :strictly_increasing => _strictly_increasing)
+

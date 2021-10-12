@@ -4,9 +4,9 @@ const BENCHED_CONSTRAINTS = deepcopy(usual_constraints)
 const DEFAULT_CONCEPTS = [(:all_different, nothing)]
 const DEFAULT_LANGUAGES = [:Julia] # [:Julia, :C, :CPP]
 const DEFAULT_METRICS = [:hamming, :manhattan]
-const DEFAULT_COMPLETE_SEARCH_LIMIT = 6^6 # could be improved with multithreading
+const DEFAULT_COMPLETE_SEARCH_LIMIT = 5^5# 6^6 # could be improved with multithreading
 const DEFAULT_PARTIAL_SEARCH_LIMIT = 4^4
-const DEFAULT_SAMPLINGS = [100, 1000]
+const DEFAULT_SAMPLINGS = [1000, 100]
 
 const MINIMUM_DOMAIN_SIZE = 3
 const MAXIMUM_DOMAIN_SIZE = 8 # NOTE - Check if it is too high
@@ -14,13 +14,13 @@ const MAXIMUM_DOMAIN_SIZE = 8 # NOTE - Check if it is too high
 function domains_sizes(;
     min_domain_size=MINIMUM_DOMAIN_SIZE, max_domain_size=MAXIMUM_DOMAIN_SIZE
 )
-    return collect(min_domain_size:max_domain_size)
+    return reverse(collect(min_domain_size:max_domain_size))
 end
 
 # Genetic Algorithms default parameters
-const MAXIMUM_TOTAL_ITERATIONS = 12 # order => 2^15 = 32768
-const MINIMUM_ICN_ITERATIONS = 4 # order => 2^5= 32
-const MINIMUM_GENERATIONS = 4 # order => 2^5 = 32
+const MAXIMUM_TOTAL_ITERATIONS = 12 # order => 2^15 = 32768 // lower this param
+const MINIMUM_ICN_ITERATIONS = 5 # order => 2^5= 32
+const MINIMUM_GENERATIONS = 5 # order => 2^5 = 32
 
 function icn_iterations(;
     min_icn_iterations=MINIMUM_ICN_ITERATIONS,
@@ -28,7 +28,7 @@ function icn_iterations(;
     max_total_iterations=MAXIMUM_TOTAL_ITERATIONS,
 )
     maximum_icn_iterations = max_total_iterations - min_generations
-    return [2^i for i in min_icn_iterations:2:maximum_icn_iterations]
+    return reverse([2^i for i in min_icn_iterations:maximum_icn_iterations])
 end
 
 function generations(;
@@ -37,10 +37,10 @@ function generations(;
     max_total_iterations=MAXIMUM_TOTAL_ITERATIONS,
 )
     maximum_generations = max_total_iterations - min_icn_iterations
-    return [2^i for i in min_generations:2:maximum_generations]
+    return reverse([2^i for i in min_generations:maximum_generations])
 end
 
-const DEFAULT_POPULATIONS = [2^i for i in 6:2:10] # 2^5=32 to 2^10 = 1024
+const DEFAULT_POPULATIONS = reverse([2^i for i in 6:8]) # 2^5=32 to 2^10 = 1024
 
 const DEFAULT_LOSS_SAMPLING_THRESHOLD = 2^10
 
@@ -65,14 +65,24 @@ const ALL_PARAMETERS = Dict(
 
     # # Learning parameter
     :metric => DEFAULT_METRICS,
-    :generations => generations(),
-    :icn_iterations => icn_iterations(),
+    :generations => [32,64,128], #generations(),
+    :icn_iterations => [32,64,128], #icn_iterations(),
     :language => DEFAULT_LANGUAGES,
     :population => DEFAULT_POPULATIONS,
-    :loss_sampler => DEFAULT_LOSS_SAMPLER,
-    :loss_sampling_threshold => DEFAULT_LOSS_SAMPLING_THRESHOLD,
+    :loss_sampler => nothing, #DEFAULT_LOSS_SAMPLER,
+    :loss_sampling_threshold => Inf, #DEFAULT_LOSS_SAMPLING_THRESHOLD,
     :memoize => DEFAULT_MEMOIZATION,
 )
 
 # ALL_PARAMETERS[:search] = [:flexible]
 # ALL_PARAMETERS[:domains_size] = 8
+
+"""
+cd ~/.julia/dev/ICNBenchmarks/scripts
+../../../../julia -t auto main.jl sum_equal_param "ALL_PARAMETERS[:generations] = [32,64,128]" "ALL_PARAMETERS[:icn_iterations] = [32,64,128]" "ALL_PARAMETERS[:loss_sampler] = nothing" "ALL_PARAMETERS[:loss_sampling_threshold] = Inf" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:complete_search_limit] = 256"
+"""
+ALL_PARAMETERS[:generations] = [32,64,128]
+ALL_PARAMETERS[:icn_iterations] = [32,64,128]
+ALL_PARAMETERS[:loss_sampler] = nothing
+ALL_PARAMETERS[:loss_sampling_threshold] = Inf
+ALL_PARAMETERS[:population] = [64,128,256]
