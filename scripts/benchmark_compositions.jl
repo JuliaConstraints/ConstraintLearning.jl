@@ -1,5 +1,19 @@
 
+using Pkg
+Pkg.add("DrWatson")
+
+# Load DrWatson (scientific project manager)
+using DrWatson
+
+# Activate the ICNBenchmarks project
+@quickactivate "ICNBenchmarks"
+
+Pkg.instantiate()
+# Pkg.update()
+
+# Load common code to all script in ICNBenchmarks
 using ICNBenchmarks
+using JSON
 
 #include(joinpath(projectdir("src"), "search_space.jl"))
 
@@ -77,7 +91,7 @@ function export_compositions(comps, path)
 end
 
 # Here I'm not sure if the formula σ is correct to calculate precision as a %
-# since the term precision I'm familiar with is a classification metric
+# Since the term precision I'm familiar with is a classification metric
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     X = if isnothing(samples)
         Iterators.flatten((solutions, non_sltns))
@@ -87,6 +101,7 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
     σ = sum(x -> 1-(abs(composition(x; param, dom_size) - metric(x, solutions)))/dom_size, X)
     return σ/length(X)
 end
-
+# divise par taille de variable * nombre de domaine pour manhattan
+# divise par taille de var pour hamming
 
 main()

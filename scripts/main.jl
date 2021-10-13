@@ -15,7 +15,7 @@ function main()
             if (Threads.nthreads() == 1)
                 @warn "Currently using only one thread\n make sure to run the script using julia -t auto"
             end
-            include("../src/base_script.jl")
+            include(joinpath(projectdir("src"), "base_script.jl"))
 
             if (length(ARGS) > 1)
                 for param in ARGS[2:end]
