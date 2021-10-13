@@ -59,7 +59,9 @@ function main()
 end
 
 function extract_data_from_json(file, counter)
-    concept = file["params"]["concept"][1]
+    concept = eval(Meta.parse("(:"*file["params"]["concept"][1]*",nothing)"))
+    
+    concept = concept(BENCHED_CONSTRAINTS[Symbol(file["params"]["concept"][1])])
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
     dom_size = file["params"]["domains_size"]
