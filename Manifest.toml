@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.0-beta4"
+julia_version = "1.7.0-rc1"
 manifest_format = "2.0"
 
 [[deps.ArgTools]]
@@ -72,7 +72,7 @@ uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 
 [[deps.CompositionalNetworks]]
 deps = ["ConstraintDomains", "Dictionaries", "Evolutionary", "JuliaFormatter", "Memoization", "OrderedCollections", "Random", "ThreadPools", "ThreadSafeDicts", "Unrolled"]
-git-tree-sha1 = "1122b6fdb49dde4b2d110f5d6a83d4e5d6b6a015"
+git-tree-sha1 = "e6733e20c919cfb09d2a53f7968f7740f4f629cb"
 repo-rev = "xp"
 repo-url = "https://github.com/JuliaConstraints/CompositionalNetworks.jl.git"
 uuid = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
