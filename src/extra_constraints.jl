@@ -84,7 +84,7 @@ const _maximum = Constraint(
 push!(BENCHED_CONSTRAINTS, :maximum => _maximum)
 
 ## intension
-concept_intension(x; param::Function) = param(x)
+concept_intension(x; param::Base.Function) = param(x)
 
 const _intension = Constraint(
     concept = concept_intension,
@@ -94,7 +94,7 @@ const _intension = Constraint(
 push!(BENCHED_CONSTRAINTS, :intension => _intension)
 
 ## linear
-concept_linear(x1, op1::Function, x2, op2::Funcion, param) = op2(op1(x1,x2),param) 
+concept_linear(x1, op1::Base.Function, x2, op2::Base.Function, param) = op2(op1(x1,x2),param) 
 
 const _linear = Constraint(
     concept = concept_linear,
