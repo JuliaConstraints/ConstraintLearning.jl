@@ -1,6 +1,6 @@
 
-using Pkg
-Pkg.add("DrWatson")
+#using Pkg
+#Pkg.add("DrWatson")
 
 # Load DrWatson (scientific project manager)
 using DrWatson
@@ -8,7 +8,7 @@ using DrWatson
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
 
-Pkg.instantiate()
+#Pkg.instantiate()
 # Pkg.update()
 
 # Load common code to all script in ICNBenchmarks
@@ -32,14 +32,13 @@ function main()
                 if isfile(path)
                     @warn "The result file already exist" file_name
                 else
-                    temp_concept, comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit, param = extract_data_from_json(
+                    temp_concept, metric, comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit, param = extract_data_from_json(
                         json, counter
                     )
 
                     @warn "describe data" extract_data_from_json(json, counter)
 
-                    concept = Constraints.concept(BENCHED_CONSTRAINTS[Symbol(temp_concept)])
-                    metric = CompositionalNetworks.hamming
+                    concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
                     solutions, non_sltns, _ = search_space(
                         dom_size,
@@ -50,8 +49,10 @@ function main()
                         solutions_limit,
                     )
 
+                    icn_composition_string = comp[findfirst("function", comp)[1]:end]
+                    icn_composition = eval(Meta.parse(icn_composition_string))
                     results = @timed loss(
-                        solutions, non_sltns, comp, metric, dom_size, param; samples=nothing
+                        solutions, non_sltns, icn_composition, metric, dom_size, param; samples=nothing
                     )
                     push!(comps, "composition" => comp)
                     push!(comps, "composition_number" => counter)
@@ -59,17 +60,17 @@ function main()
                     push!(comps, "time" => results.time)
                     push!(comps, "accuracy" => results.value)
                     export_compositions(comps, path)
-                    counter += 1
                 end
+                counter += 1
             end
         end
     end
 end
 
 function extract_data_from_json(file, counter)
-    concept = eval(Meta.parse("(:"*file["params"]["concept"][1]*",nothing)"))
+    concept = Symbol(file["params"]["concept"][1])
     
-    concept = concept(BENCHED_CONSTRAINTS[Symbol(file["params"]["concept"][1])])
+    metric = Symbol(file["params"]["metric"])
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
     dom_size = file["params"]["domains_size"]
@@ -78,11 +79,8 @@ function extract_data_from_json(file, counter)
     solutions_limit = file["params"]["sampling"]
     param = generate_param(file["params"]["concept"][2])
 
-    eval(Meta.parse(comp))
 
-
-
-    return concept,
+    return concept, metric,
     comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit,
     param
 end
@@ -103,7 +101,9 @@ function export_compositions(comps, path)
     touch(path)
     return write(path, JSON.json(comps, 2))
 end
-
+```
+test
+```
 # Here I'm not sure if the formula σ is correct to calculate precision as a %
 # Since the term precision I'm familiar with is a classification metric
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
@@ -117,7 +117,7 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
     end
 
     σ = sum(
-        x -> 1 - (abs(Constraints.icn_all_different(x; param, dom_size) - metric(x, solutions))) / dom_size, X
+        x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
     )
     return σ / l
 end
