@@ -70,7 +70,7 @@ end
 function extract_data_from_json(file, counter)
     concept = Symbol(file["params"]["concept"][1])
     
-    metric = Symbol(file["params"]["metric"])
+    metric = eval(Meta.parse(file["params"]["metric"]))
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
     dom_size = file["params"]["domains_size"]
