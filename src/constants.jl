@@ -78,8 +78,9 @@ const ALL_PARAMETERS = Dict(
 # ALL_PARAMETERS[:domains_size] = 8
 
 """
+to run on khromeleque: 
 cd ~/.julia/dev/ICNBenchmarks/scripts
-../../../../julia -t auto main.jl sum_equal_param "ALL_PARAMETERS[:generations] = [32,64,128]" "ALL_PARAMETERS[:icn_iterations] = [32,64,128]" "ALL_PARAMETERS[:loss_sampler] = nothing" "ALL_PARAMETERS[:loss_sampling_threshold] = Inf" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:complete_search_limit] = 256"
+../../../../julia -t auto main.jl no_overlap "ALL_PARAMETERS[:generations] = [32,64,128]" "ALL_PARAMETERS[:icn_iterations] = [32,64,128]" "ALL_PARAMETERS[:loss_sampler] = nothing" "ALL_PARAMETERS[:loss_sampling_threshold] = Inf" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:population] = [64,128,256]" "ALL_PARAMETERS[:complete_search_limit] = 256"
 """
 ALL_PARAMETERS[:generations] = [32,64,128]
 ALL_PARAMETERS[:icn_iterations] = [32,64,128]

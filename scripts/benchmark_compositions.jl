@@ -115,7 +115,6 @@ function generate_file_name(file, counter)
     return string(file_name, ".json")
 end
 
-
 # Here I'm not sure if the formula σ is correct to calculate precision as a %
 # Since the term precision I'm familiar with is a classification metric
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
@@ -127,13 +126,26 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         l += samples
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
-    # σ = sum(
-    #     x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
-    # )
-    return map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
-    #return σ / l
+    
+    result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
+    return result
 end
 # divise par taille de variable * nombre de domaine pour manhattan
 # divise par taille de var pour hamming
+
+
+# relative standard deviation
+function rsd(metric, results, dom_size)
+    if (metric == :manhattan)
+        return results ./ (dom_size^2)
+    elseif (metric == :hamming)
+        return results ./ dom_size
+    end
+    return
+end
+
+# mean
+mean = (results) -> sum(results)/length(results)
+
 
 main()
