@@ -16,8 +16,13 @@ function analyze_icn()
             push!(df, Dict(pairs(d3)))
         end
     end
-    return Voyager(df)
+    return df
 end
 
 function analyse_composition()
+
 end
+
+visualize_icn() = Voyager(analyze_icn())
+
+visualize_compositions() = Voyager(analyze_composition())

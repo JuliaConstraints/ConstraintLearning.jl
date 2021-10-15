@@ -21,10 +21,12 @@ export ALL_PARAMETERS
 export BENCHED_CONSTRAINTS
 
 # others
-export analyze_icn
 export analyse_composition
+export analyze_icn
 export icn_benchmark
 export search_space
+export visualize_compositions
+export visualize_icn
 
 # includes
 include("constants.jl")
