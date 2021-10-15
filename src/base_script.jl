@@ -1,4 +1,4 @@
-#using Pkg
+using Pkg
 #Pkg.add("DrWatson")
 
 # Load DrWatson (scientific project manager)
