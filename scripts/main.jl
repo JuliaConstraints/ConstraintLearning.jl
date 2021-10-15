@@ -1,3 +1,6 @@
+using DrWatson
+@quickactivate "ICNBenchmarks"
+
 function main()
     if isempty(ARGS)
         @warn "No arguments found\nUsage: julia -t auto main.jl \"concept\" \"params\""
