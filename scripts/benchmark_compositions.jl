@@ -22,13 +22,13 @@ using CompositionalNetworks
 function main()
     comps = Dict{Any,Any}()
     mkpath(datadir("composition_results"))
-    for file_name in cd(readdir, joinpath(datadir("compositions")))
+    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
-                path = joinpath(datadir("composition_results"), file_name)
-                path = "$(path[1:end-5])_$counter.json"
+                path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
+                #path = "$(path[1:end-5])_$counter.json"
                 if isfile(path)
                     @warn "The result file already exist" file_name
                 else
@@ -101,9 +101,21 @@ function export_compositions(comps, path)
     touch(path)
     return write(path, JSON.json(comps, 2))
 end
-```
-test
-```
+
+function generate_file_name(file, counter)
+    concept = file["params"]["concept"][1]
+    symbols = file[string(counter)]["symbols"]
+    file_name = concept
+    for symbol in reverse(symbols)[1:end-1]
+        file_name = string(file_name,"__",symbol[1])
+    end
+    for transformation in reverse(symbols[1])
+            file_name = string(file_name,"__",transformation)
+    end
+    return file_name
+end
+
+
 # Here I'm not sure if the formula σ is correct to calculate precision as a %
 # Since the term precision I'm familiar with is a classification metric
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
@@ -116,10 +128,13 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
 
-    σ = sum(
-        x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
-    )
-    return σ / l
+    # σ = sum(
+    #     x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
+    # )
+
+    return map(x -> abs(composition(x; param, dom_size) - metric(x, solutions)), X)
+
+    #return σ / l
 end
 # divise par taille de variable * nombre de domaine pour manhattan
 # divise par taille de var pour hamming
