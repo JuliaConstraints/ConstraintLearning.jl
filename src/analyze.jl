@@ -1,4 +1,4 @@
-function analyze()
+function analyze_icn()
     @info """Start the analyze of files in $datadir("compositions")"""
     df = DataFrame()
     for f in readdir(datadir("compositions"); join = true)
@@ -17,4 +17,7 @@ function analyze()
         end
     end
     return Voyager(df)
+end
+
+function analyse_composition()
 end

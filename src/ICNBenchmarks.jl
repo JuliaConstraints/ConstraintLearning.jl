@@ -21,7 +21,8 @@ export ALL_PARAMETERS
 export BENCHED_CONSTRAINTS
 
 # others
-export analyze
+export analyze_icn
+export analyse_composition
 export icn_benchmark
 export search_space
 
