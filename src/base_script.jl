@@ -1,11 +1,11 @@
-using Pkg
-Pkg.add("DrWatson")
+#using Pkg
+#Pkg.add("DrWatson")
 
 # Load DrWatson (scientific project manager)
-using DrWatson
+#using DrWatson
 
 # Activate the ICNBenchmarks project
-@quickactivate "ICNBenchmarks"
+#@quickactivate "ICNBenchmarks"
 
 Pkg.instantiate()
 # Pkg.update()
