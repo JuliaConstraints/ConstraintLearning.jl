@@ -130,7 +130,7 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
     # σ = sum(
     #     x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
     # )
-    return map(x -> abs(composition(x; param, dom_size) - metric(x, solutions)), X)
+    return map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
     #return σ / l
 end
 # divise par taille de variable * nombre de domaine pour manhattan
