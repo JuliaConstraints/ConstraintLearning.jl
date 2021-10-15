@@ -112,7 +112,7 @@ function generate_file_name(file, counter)
     for transformation in reverse(symbols[1])
             file_name = string(file_name,"__",transformation)
     end
-    return file_name
+    return string(file_name, ".json")
 end
 
 
@@ -127,13 +127,10 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         l += samples
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
-
     # σ = sum(
     #     x -> 1 - (abs(composition(x; param, dom_size) - metric(x, solutions))) / dom_size, X
     # )
-
     return map(x -> abs(composition(x; param, dom_size) - metric(x, solutions)), X)
-
     #return σ / l
 end
 # divise par taille de variable * nombre de domaine pour manhattan
