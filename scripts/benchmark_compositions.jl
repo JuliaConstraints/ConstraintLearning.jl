@@ -4,6 +4,7 @@
 
 # Load DrWatson (scientific project manager)
 using DrWatson
+using Statistics
 
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
@@ -30,7 +31,7 @@ function main()
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
                 #path = "$(path[1:end-5])_$counter.json"
                 if isfile(path)
-                    @warn "The result file already exist" file_name
+                    @warn "The result file already exist" path
                 else
                     temp_concept, metric, comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit, param = extract_data_from_json(
                         json, counter
@@ -52,13 +53,21 @@ function main()
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
                     results = @timed loss(
-                        solutions, non_sltns, icn_composition, metric, dom_size, param; samples=nothing
+                        solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
+                    normalised_results = normalise(Symbol(metric), results.value, dom_size)
                     push!(comps, "composition" => comp)
                     push!(comps, "composition_number" => counter)
                     push!(comps, "selection_rate" => selection_rate)
                     push!(comps, "time" => results.time)
                     push!(comps, "accuracy" => results.value)
+                    push!(comps, "normalized" => normalised_results)
+                    push!(comps, "mean" => mean(normalised_results))
+                    push!(comps, "median" => median(normalised_results))
+                    push!(comps, "std" => std(normalised_results, corrected=false))
+                    push!(comps, "rsd" => rsd(normalised_results))
+                    push!(comps, "var" => var(normalised_results))
+                    push!(comps, "cov" => cov(normalised_results))
                     export_compositions(comps, path)
                 end
                 counter += 1
@@ -70,7 +79,7 @@ end
 function extract_data_from_json(file, counter)
     concept = Symbol(file["params"]["concept"][1])
     
-    metric = eval(Meta.parse(file["params"]["metric"]))
+    metric = file["params"]["metric"]
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
     dom_size = file["params"]["domains_size"]
@@ -135,17 +144,13 @@ end
 
 
 # relative standard deviation
-function rsd(metric, results, dom_size)
-    if (metric == :manhattan)
-        return results ./ (dom_size^2)
-    elseif (metric == :hamming)
-        return results ./ dom_size
-    end
-    return
-end
+rsd(results) = std(results, corrected=false)/mean(results) 
 
-# mean
-mean = (results) -> sum(results)/length(results)
+
+# normalise
+normalise(metric, results, dom_size) = normalise(results, dom_size, Val(metric))
+normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
+normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 
 main()
