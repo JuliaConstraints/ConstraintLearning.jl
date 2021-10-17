@@ -66,8 +66,8 @@ function main()
                     push!(comps, "median" => median(normalised_results))
                     push!(comps, "std" => std(normalised_results, corrected=false))
                     push!(comps, "rsd" => rsd(normalised_results))
-                    push!(comps, "var" => var(normalised_results))
-                    push!(comps, "cov" => cov(normalised_results))
+                    push!(comps, "var" => var(normalised_results, corrected=false))
+                    push!(comps, "cov" => cov(normalised_results, corrected=false))
                     export_compositions(comps, path)
                 end
                 counter += 1
