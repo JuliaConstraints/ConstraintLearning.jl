@@ -22,7 +22,7 @@ using CompositionalNetworks
 
 function main(; clear_results=false)
     comps = Dict{Any,Any}()
-    comps_df = ""
+    comps_df = DataFrame()
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
     #=Threads.@threads=# for file_name in cd(readdir, joinpath(datadir("compositions")))
@@ -71,18 +71,20 @@ function main(; clear_results=false)
                     push!(comps, "var" => var(normalised_results, corrected=false))
                     push!(comps, "cov" => cov(normalised_results, corrected=false))
                     export_compositions(comps, path)
-                    comps_df = construct_df("", comps)
+                    export_csv(comps, joinpath(datadir("composition_results"), "results.csv"))
+                    #return comps
+                    #comps_df = construct_df!(comps_df, comps)
                 end
                 counter += 1
             end
         end
     end
 
-    export_csv(comps_df, joinpath(datadir("composition_results"), "results.csv"))
-    return nothing
+    #export_csv(comps_df, joinpath(datadir("composition_results"), "results.csv"))
+    return comps_df
 end
 
-function construct_df(comps_df ,comps)
+function construct_df!(comps_df ,comps)
     created = false
     # if isnothing(comps_df)
     #     comps_df = DataFrame()
@@ -146,13 +148,25 @@ function export_compositions(comps, path)
 end
 
 function export_csv(comps, path)
+    temp_dict = deepcopy(comps)
+    delete!(temp_dict, "accuracy")
+    delete!(temp_dict, "normalised")
+    delete!(temp_dict, "composition")
+    df = DataFrame(temp_dict)
     # touch(path)
     # return CSV.write(path, comps, 2)
     
     #df = DataFrame(comps)
     #print(DataFrame(comps))
-    CSV.write("/Users/pro/.julia/dev/ICNBenchmarks/data/composition_results/test.csv",
-        comps)
+    temp_path = "/Users/pro/.julia/dev/ICNBenchmarks/data/composition_results/test.csv"
+    if isfile(temp_path)
+        @info "file already exists"
+        CSV.write(temp_path, df, append=true)
+    else
+        @info "file does not exist... creating a new one"
+        CSV.write(temp_path, df)
+    end
+        
     
     #CSV.write("test.csv", test)
 
@@ -200,4 +214,4 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 
-main(;clear_results = true)
+a = main(;clear_results = true)
