@@ -20,10 +20,12 @@ using CompositionalNetworks
 
 #include(joinpath(projectdir("src"), "search_space.jl"))
 
-function main()
+function main(; clear_results=false)
     comps = Dict{Any,Any}()
+    comps_df = ""
+    clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
-    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
+    #=Threads.@threads=# for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
@@ -61,7 +63,7 @@ function main()
                     push!(comps, "selection_rate" => selection_rate)
                     push!(comps, "time" => results.time)
                     push!(comps, "accuracy" => results.value)
-                    push!(comps, "normalized" => normalised_results)
+                    push!(comps, "normalised" => normalised_results)
                     push!(comps, "mean" => mean(normalised_results))
                     push!(comps, "median" => median(normalised_results))
                     push!(comps, "std" => std(normalised_results, corrected=false))
@@ -69,11 +71,43 @@ function main()
                     push!(comps, "var" => var(normalised_results, corrected=false))
                     push!(comps, "cov" => cov(normalised_results, corrected=false))
                     export_compositions(comps, path)
+                    comps_df = construct_df("", comps)
                 end
                 counter += 1
             end
         end
     end
+
+    export_csv(comps_df, joinpath(datadir("composition_results"), "results.csv"))
+    return nothing
+end
+
+function construct_df(comps_df ,comps)
+    created = false
+    # if isnothing(comps_df)
+    #     comps_df = DataFrame()
+    #     created = true
+    # end
+    delete!(comps, "accuracy")
+    delete!(comps, "normalised")
+    delete!(comps, "composition")
+    str = "comps_df = DataFrame("
+    for column_name in collect(keys(comps))
+        str = string(str, "$column_name = [1],")
+        # if created
+        #     eval(Meta.parse("comps_df.$column_name = [1]"))
+        #     @info comps_df
+        # else
+        #     @info comps_df
+        #     l = length(keys(comps))
+        #     #push!(df, rand(Int, (l)))
+        # end
+        #df.column_name = [comps[column_name]]
+    end
+    str = string(str[1:end-1],")")
+    eval(Meta.parse(str))
+    @info comps_df
+    return comps_df
 end
 
 function extract_data_from_json(file, counter)
@@ -109,6 +143,19 @@ end
 function export_compositions(comps, path)
     touch(path)
     return write(path, JSON.json(comps, 2))
+end
+
+function export_csv(comps, path)
+    # touch(path)
+    # return CSV.write(path, comps, 2)
+    
+    #df = DataFrame(comps)
+    #print(DataFrame(comps))
+    CSV.write("/Users/pro/.julia/dev/ICNBenchmarks/data/composition_results/test.csv",
+        comps)
+    
+    #CSV.write("test.csv", test)
+
 end
 
 function generate_file_name(file, counter)
@@ -153,4 +200,4 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 
-main()
+main(;clear_results = true)
