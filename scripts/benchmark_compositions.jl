@@ -1,4 +1,3 @@
-
 #using Pkg
 #Pkg.add("DrWatson")
 
@@ -33,7 +32,10 @@ function main(; clear_results=false)
                 if isfile(path)
                     @warn "The result file already exist" path
                 else
-                    temp_concept, metric, comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit, param = extract_data_from_json(
+                    memoize, population, generations, icn_iterations, partial_search_limit, 
+                    icn_time, maths, temp_concept, metric, comp, 
+                    selection_rate, dom_size, search, complete_search_limit, 
+                    solutions_limit, param = extract_data_from_json(
                         json, counter
                     )
 
@@ -56,6 +58,17 @@ function main(; clear_results=false)
                         solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
                     normalised_results = normalise(Symbol(metric), results.value, dom_size)
+                    push!(comps, "icn_time" => icn_time)
+                    push!(comps, "search" => search)
+                    push!(comps, "concept" => temp_concept)
+                    push!(comps, "complete_search_limit" => complete_search_limit)
+                    push!(comps, "memoize" => memoize)
+                    push!(comps, "sampling" => solutions_limit)
+                    push!(comps, "population" => population)
+                    push!(comps, "generations" => generations)
+                    push!(comps, "icn_iterations" => icn_iterations)
+                    push!(comps, "partial_search_limit" => partial_search_limit)
+                    push!(comps, "maths" => maths)
                     push!(comps, "composition" => comp)
                     push!(comps, "composition_number" => counter)
                     push!(comps, "selection_rate" => selection_rate)
@@ -80,8 +93,16 @@ function main(; clear_results=false)
 end
 
 function extract_data_from_json(file, counter)
+
+    icn_time = file["icn_time"]
+    memoize = file["params"]["memoize"]
+    population = file["params"]["population"]
+    generations = file["params"]["generations"]
+    icn_iterations = file["params"]["icn_iterations"]
+    search = file["params"]["search"]
+    partial_search_limit = file["params"]["partial_search_limit"]
     concept = Symbol(file["params"]["concept"][1])
-    
+    maths = file[string(counter)]["maths"]
     metric = file["params"]["metric"]
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
@@ -91,10 +112,9 @@ function extract_data_from_json(file, counter)
     solutions_limit = file["params"]["sampling"]
     param = generate_param(file["params"]["concept"][2])
 
-
-    return concept, metric,
-    comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit,
-    param
+    return memoize, population, generations, icn_iterations, partial_search_limit,
+    icn_time, maths, concept, metric,comp, selection_rate, dom_size, 
+    search, complete_search_limit, solutions_limit, param
 end
 
 function generate_param(param)
