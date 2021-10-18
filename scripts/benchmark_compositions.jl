@@ -22,16 +22,14 @@ using CompositionalNetworks
 
 function main(; clear_results=false)
     comps = Dict{Any,Any}()
-    comps_df = DataFrame()
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
-    #=Threads.@threads=# for file_name in cd(readdir, joinpath(datadir("compositions")))
+    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
-                #path = "$(path[1:end-5])_$counter.json"
                 if isfile(path)
                     @warn "The result file already exist" path
                 else
@@ -72,44 +70,13 @@ function main(; clear_results=false)
                     push!(comps, "cov" => cov(normalised_results, corrected=false))
                     export_compositions(comps, path)
                     export_csv(comps, joinpath(datadir("composition_results"), "results.csv"))
-                    #return comps
-                    #comps_df = construct_df!(comps_df, comps)
                 end
                 counter += 1
             end
         end
     end
 
-    #export_csv(comps_df, joinpath(datadir("composition_results"), "results.csv"))
-    return comps_df
-end
-
-function construct_df!(comps_df ,comps)
-    created = false
-    # if isnothing(comps_df)
-    #     comps_df = DataFrame()
-    #     created = true
-    # end
-    delete!(comps, "accuracy")
-    delete!(comps, "normalised")
-    delete!(comps, "composition")
-    str = "comps_df = DataFrame("
-    for column_name in collect(keys(comps))
-        str = string(str, "$column_name = [1],")
-        # if created
-        #     eval(Meta.parse("comps_df.$column_name = [1]"))
-        #     @info comps_df
-        # else
-        #     @info comps_df
-        #     l = length(keys(comps))
-        #     #push!(df, rand(Int, (l)))
-        # end
-        #df.column_name = [comps[column_name]]
-    end
-    str = string(str[1:end-1],")")
-    eval(Meta.parse(str))
-    @info comps_df
-    return comps_df
+    return nothing
 end
 
 function extract_data_from_json(file, counter)
@@ -147,29 +114,33 @@ function export_compositions(comps, path)
     return write(path, JSON.json(comps, 2))
 end
 
+# This function must be very bad performance wise, please tell me if you have better solutions :-)
 function export_csv(comps, path)
-    temp_dict = deepcopy(comps)
-    delete!(temp_dict, "accuracy")
-    delete!(temp_dict, "normalised")
-    delete!(temp_dict, "composition")
-    df = DataFrame(temp_dict)
-    # touch(path)
-    # return CSV.write(path, comps, 2)
+    temp_dict = Dict{String, String}()
+    delete!(comps, "composition")
+    for column_name in collect(keys(comps))
+        if isequal(column_name, "accuracy") || isequal(column_name, "normalised")
+            value_str = "["
+            for value in comps[column_name]
+                value_str = string(value_str, string(value), ", ")
+            end
+            value_str = string(value_str[1:end-2], "]")
+            temp_dict[column_name] = value_str
+        else
+            temp_dict[column_name] = string(comps[column_name])
+        end
+    end
     
-    #df = DataFrame(comps)
-    #print(DataFrame(comps))
-    temp_path = "/Users/pro/.julia/dev/ICNBenchmarks/data/composition_results/test.csv"
-    if isfile(temp_path)
+    df = DataFrame(temp_dict)
+    
+    if isfile(path)
         @info "file already exists"
-        CSV.write(temp_path, df, append=true)
+        CSV.write(path, df, append=true)
     else
         @info "file does not exist... creating a new one"
-        CSV.write(temp_path, df)
+        CSV.write(path, df)
     end
         
-    
-    #CSV.write("test.csv", test)
-
 end
 
 function generate_file_name(file, counter)
@@ -185,8 +156,6 @@ function generate_file_name(file, counter)
     return string(file_name, ".json")
 end
 
-# Here I'm not sure if the formula σ is correct to calculate precision as a %
-# Since the term precision I'm familiar with is a classification metric
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
@@ -200,9 +169,6 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
     return result
 end
-# divise par taille de variable * nombre de domaine pour manhattan
-# divise par taille de var pour hamming
-
 
 # relative standard deviation
 rsd(results) = std(results, corrected=false)/mean(results) 
@@ -210,8 +176,10 @@ rsd(results) = std(results, corrected=false)/mean(results)
 
 # normalise
 normalise(metric, results, dom_size) = normalise(results, dom_size, Val(metric))
+# divise par taille de variable * nombre de domaine pour manhattan
 normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
+# divise par taille de var pour hamming
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 
-a = main(;clear_results = true)
+main(;clear_results = true)
