@@ -4,6 +4,8 @@
 # Load DrWatson (scientific project manager)
 using DrWatson
 using Statistics
+using CSV
+using DataFrames
 
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
