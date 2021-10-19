@@ -41,7 +41,7 @@ function main(; clear_results=false)
                         json, counter
                     )
 
-                    @warn "describe data" extract_data_from_json(json, counter)
+                    #@warn "describe data" extract_data_from_json(json, counter)
 
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
@@ -204,4 +204,4 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 
-main(;clear_results = true)
+main(;clear_results = false)
