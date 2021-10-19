@@ -191,7 +191,7 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
     
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
     # Remove last defined version of the compositon, it gives an error for some reason
-    Base.delete_methid(@which composition(x; param, dom_size))
+    Base.delete_method(@which composition(x; param, dom_size))
     return result
 end
 
