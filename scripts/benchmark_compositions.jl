@@ -4,8 +4,6 @@
 # Load DrWatson (scientific project manager)
 using DrWatson
 using Statistics
-using CSV
-using DataFrames
 
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
@@ -18,6 +16,9 @@ using ICNBenchmarks
 using JSON
 using Constraints
 using CompositionalNetworks
+
+using CSV
+using DataFrames
 
 #include(joinpath(projectdir("src"), "search_space.jl"))
 
