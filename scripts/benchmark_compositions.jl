@@ -193,7 +193,7 @@ function loss(n_transformations, solutions, non_sltns, composition, metric, dom_
     #result = map(x -> 0 ,X)
 
     #try
-        result =  map(x -> abs(Base.invokelatest(composition, x; X=zeros(length(x), n_transformations), param, dom_size) - metric(x, solutions)), X)   
+        result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
         #result =  map(x -> abs(composition(x; X=zeros(length(x), n_transformations), param=param, dom_size=dom_size) - metric(x, solutions)), X)
     # catch e 
     #     @info file_name
