@@ -26,6 +26,7 @@ function main(; clear_results=false)
     comps = Dict{Any,Any}()
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
+    number_of_compositions = 0
     Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
@@ -33,7 +34,7 @@ function main(; clear_results=false)
             while (haskey(json, string(counter)))
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
                 if isfile(path)
-                    @warn "The result file already exist" path
+                    #@warn "The result file already exist" path
                 else
                     memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
@@ -57,7 +58,7 @@ function main(; clear_results=false)
 
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
-                    results = @timed loss(
+                    results = @timed loss( counter, file_name, 
                         solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
                     normalised_results = normalise(Symbol(metric), results.value, dom_size)
@@ -89,6 +90,8 @@ function main(; clear_results=false)
                 end
                 counter += 1
             end
+            number_of_compositions += counter
+            @info "number of compositions: " number_of_compositions
         end
     end
 
@@ -157,10 +160,8 @@ function export_csv(comps, path)
     df = DataFrame(temp_dict)
     
     if isfile(path)
-        @info "file already exists"
         CSV.write(path, df, append=true)
     else
-        @info "file does not exist... creating a new one"
         CSV.write(path, df)
     end
         
@@ -179,7 +180,7 @@ function generate_file_name(file, counter)
     return string(file_name, ".json")
 end
 
-function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+function loss(comp_number, file_name, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
         l += length(non_sltns)
@@ -189,7 +190,15 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
     
-    result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)
+    #result = map(x -> 0 ,X)
+
+    #try
+        result =  map(x -> abs(composition(x; param=param, dom_size=dom_size) - metric(x, solutions)), X)
+    # catch e 
+    #     @info file_name
+    #     @info comp_number
+    #     @info e 
+    # end
     # Remove last defined version of the compositon, it gives an error for some reason
     #Base.delete_method(@which composition(x; param, dom_size))
     for m ∈ methods(composition)
@@ -209,6 +218,34 @@ normalise(metric, results, dom_size) = normalise(results, dom_size, Val(metric))
 normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 # divise par taille de var pour hamming
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
+
+
+function count_compositions()
+    total_compositions = 0
+    unique_compositions = 0
+    existing_comps = []
+    for file_name in cd(readdir, joinpath(datadir("compositions")))
+        if startswith(file_name, "con=")
+            json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
+            unique_counter = 1
+            counter = 1
+            while (haskey(json, string(counter)))
+                path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
+                if path ∉ existing_comps
+                    unique_counter += 1
+                    push!(existing_comps, path)
+                end
+                counter += 1
+            end
+            total_compositions += counter
+            unique_compositions += unique_counter
+        end
+        @info "current number of compositions: " total_compositions
+        @info "current number of unique compositions: " unique_compositions
+    end
+    @info "total number of compositions: " total_compositions
+    @info "total number of unique compositions: " unique_compositions
+end
 
 
 main(;clear_results = false)
