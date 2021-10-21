@@ -58,7 +58,7 @@ function main(; clear_results=false)
 
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
-                    results = @timed loss(n_transformations, 
+                    results = @timed loss(file_name, counter, n_transformations, 
                         solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
                     normalised_results = normalise(Symbol(metric), results.value, dom_size)
@@ -180,7 +180,7 @@ function generate_file_name(file, counter)
     return string(file_name, ".json")
 end
 
-function loss(n_transformations, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+function loss(file_name, comp_number, n_transformations, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
         l += length(non_sltns)
@@ -191,7 +191,13 @@ function loss(n_transformations, solutions, non_sltns, composition, metric, dom_
     end
     
     #result = map(x -> 0 ,X)
-
+    try
+        map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
+    catch e
+        @info file_name
+        @info comp_number
+        @info e
+    end
     #try
         result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
         #result =  map(x -> abs(composition(x; X=zeros(length(x), n_transformations), param=param, dom_size=dom_size) - metric(x, solutions)), X)
