@@ -27,7 +27,8 @@ function main(; clear_results=false)
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
-    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
+    #Threads.@threads for some reason causes nested task error: UndefRefError: access to undefined reference
+    for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
@@ -199,7 +200,7 @@ function loss(file_name, comp_number, n_transformations, solutions, non_sltns, c
         @info e
     end
     #try
-        result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
+    result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
         #result =  map(x -> abs(composition(x; X=zeros(length(x), n_transformations), param=param, dom_size=dom_size) - metric(x, solutions)), X)
     # catch e 
     #     @info file_name
