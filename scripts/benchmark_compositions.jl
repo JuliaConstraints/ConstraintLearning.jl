@@ -36,7 +36,7 @@ function main(; clear_results=false)
                 if isfile(path)
                     #@warn "The result file already exist" path
                 else
-                    memoize, population, generations, icn_iterations, partial_search_limit, 
+                    n_transformations, memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
                     selection_rate, dom_size, search, complete_search_limit, 
                     solutions_limit, param = extract_data_from_json(
@@ -58,7 +58,7 @@ function main(; clear_results=false)
 
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
-                    results = @timed loss( counter, file_name, 
+                    results = @timed loss(n_transformations, 
                         solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
                     normalised_results = normalise(Symbol(metric), results.value, dom_size)
@@ -99,7 +99,7 @@ function main(; clear_results=false)
 end
 
 function extract_data_from_json(file, counter)
-
+    symbols_count = length(file[string(counter)]["symbols"][1])
     icn_time = file["icn_time"]
     memoize = file["params"]["memoize"]
     population = file["params"]["population"]
@@ -118,7 +118,7 @@ function extract_data_from_json(file, counter)
     solutions_limit = file["params"]["sampling"]
     param = generate_param(file["params"]["concept"][2])
 
-    return memoize, population, generations, icn_iterations, partial_search_limit,
+    return symbols_count, memoize, population, generations, icn_iterations, partial_search_limit,
     icn_time, maths, concept, metric,comp, selection_rate, dom_size, 
     search, complete_search_limit, solutions_limit, param
 end
@@ -180,7 +180,7 @@ function generate_file_name(file, counter)
     return string(file_name, ".json")
 end
 
-function loss(comp_number, file_name, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+function loss(n_transformations, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
         l += length(non_sltns)
@@ -193,7 +193,7 @@ function loss(comp_number, file_name, solutions, non_sltns, composition, metric,
     #result = map(x -> 0 ,X)
 
     #try
-        result =  map(x -> abs(composition(x; param=param, dom_size=dom_size) - metric(x, solutions)), X)
+        result =  map(x -> abs(composition(x; X=zeros(length(x), n_transformations), param=param, dom_size=dom_size) - metric(x, solutions)), X)
     # catch e 
     #     @info file_name
     #     @info comp_number
