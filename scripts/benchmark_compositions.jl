@@ -27,7 +27,7 @@ function main(; clear_results=false)
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
-    #Threads.@threads for some reason causes nested task error: UndefRefError: access to undefined reference
+    #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
     for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
@@ -117,14 +117,14 @@ function extract_data_from_json(file, counter)
     search = eval(Meta.parse(":" * file["params"]["search"]))
     complete_search_limit = file["params"]["complete_search_limit"]
     solutions_limit = file["params"]["sampling"]
-    param = generate_param(file["params"]["concept"][2])
+    param = generate_param(file["params"]["concept"][2], dom_size)
 
     return symbols_count, memoize, population, generations, icn_iterations, partial_search_limit,
     icn_time, maths, concept, metric,comp, selection_rate, dom_size, 
     search, complete_search_limit, solutions_limit, param
 end
 
-function generate_param(param)
+function generate_param(param, dom_size)
     # Generate an appropriate parameter for the concept if relevant
     param = if isnothing(param)
         nothing
