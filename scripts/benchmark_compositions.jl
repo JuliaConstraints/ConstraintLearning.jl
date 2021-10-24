@@ -27,13 +27,14 @@ function main(; clear_results=false)
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
+    symbols_dict = Dict{String, Int64}()
     #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
     for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
-                path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
+                path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
                 if isfile(path)
                     #@warn "The result file already exist" path
                 else
@@ -95,6 +96,8 @@ function main(; clear_results=false)
             @info "number of compositions: " number_of_compositions
         end
     end
+    
+    export_symbols_dict(symbols_dict)
 
     return nothing
 end
@@ -141,6 +144,13 @@ function export_compositions(comps, path)
     return write(path, JSON.json(comps, 2))
 end
 
+function export_symbols_dict(symbols_dict::Dict{String, Int64})
+    path = joinpath(datadir("composition_results"), "sybols_dict.csv")
+    
+    CSV.write(path, DataFrame(symbols_dict))
+
+end
+
 # This function must be very bad performance wise, please tell me if you have better solutions :-)
 function export_csv(comps, path)
     temp_dict = Dict{String, String}()
@@ -168,15 +178,26 @@ function export_csv(comps, path)
         
 end
 
-function generate_file_name(file, counter)
+function generate_file_name(file, counter, symbols_dict)
     concept = file["params"]["concept"][1]
     symbols = file[string(counter)]["symbols"]
+
+    # sort transformation symbols to avoid duplicate compositions
+    sort!(symbols[1])
+
     file_name = concept
     for symbol in reverse(symbols)[1:end-1]
-        file_name = string(file_name,"__",symbol[1])
+        if symbol[1] ∉ keys(symbols_dict)
+            push!(symbols_dict, symbol[1] => length(symbols_dict) + 1)
+        end
+        file_name = string(file_name,"_",symbols_dict[symbol[1]])
     end
+
     for transformation in reverse(symbols[1])
-            file_name = string(file_name,"__",transformation)
+        if transformation ∉ keys(symbols_dict)
+            push!(symbols_dict, transformation => length(symbols_dict) + 1)
+        end
+        file_name = string(file_name,"_",symbols_dict[transformation])
     end
     return string(file_name, ".json")
 end
@@ -237,8 +258,9 @@ function count_compositions()
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             unique_counter = 1
             counter = 1
+            symbol_number = 1
             while (haskey(json, string(counter)))
-                path = joinpath(datadir("composition_results"), generate_file_name(json, counter))
+                path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
                 if path ∉ existing_comps
                     unique_counter += 1
                     push!(existing_comps, path)
@@ -256,4 +278,7 @@ function count_compositions()
 end
 
 
-main(;clear_results = false)
+main(;clear_results = true)
+
+
+# TODO:: 
