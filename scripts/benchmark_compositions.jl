@@ -84,7 +84,7 @@ function main(; clear_results=false)
                     push!(comps, "mean" => mean(normalised_results))
                     push!(comps, "median" => median(normalised_results))
                     push!(comps, "std" => std(normalised_results, corrected=false))
-                    push!(comps, "rsd" => rsd(normalised_results))
+                    #push!(comps, "rsd" => rsd(normalised_results))
                     push!(comps, "var" => var(normalised_results, corrected=false))
                     push!(comps, "cov" => cov(normalised_results, corrected=false))
                     export_compositions(comps, path)
@@ -96,7 +96,7 @@ function main(; clear_results=false)
             @info "number of compositions: " number_of_compositions
         end
     end
-    
+
     export_symbols_dict(symbols_dict)
 
     return nothing

@@ -53,9 +53,9 @@ cov, complete_search_limit, median, search, population, selection_rate
 function analyze_composition()
     @info """Start the analyze of files in $datadir("composition_results")"""
     df = DataFrame()
-    for f in readdir(datadir("composition_results"); join = true)
+    for f in filter(x -> endswith(x, ".json"),readdir(datadir("composition_results"); join = true))
         d = JSON.parsefile(f)
-        inds1 = Indices(["icn_iterations", "time", "composition_number", "rsd", "mean", "std", "icn_time", "memoize", "var", "concept", "partial_search_limit", "sampling", "generations",
+        inds1 = Indices(["icn_iterations", "time", "composition_number", "mean", "std", "icn_time", "memoize", "var", "concept", "partial_search_limit", "sampling", "generations",
         "cov", "complete_search_limit", "median", "search", "population", "selection_rate"])
         d1 = view(Dictionary(d),inds1)
         # inds2 = Indices(["icn_iterations", "loss_sampler", "domains_size", "memoize", "metric", "sampling", "generations", "search", "population", "concept"])
@@ -72,6 +72,6 @@ function analyze_composition()
     return df
 end
 
-#visualize_icn() = Voyager(analyze_icn())
+visualize_icn() = Voyager(analyze_icn())
 
 visualize_compositions() = Voyager(analyze_composition())
