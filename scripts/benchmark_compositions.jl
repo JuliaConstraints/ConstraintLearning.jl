@@ -36,7 +36,7 @@ function main(; clear_results=false)
             while (haskey(json, string(counter)))
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
                 if isfile(path)
-                    #@warn "The result file already exist" path
+                    @warn "The result file already exist" path
                 else
                     n_transformations, memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
