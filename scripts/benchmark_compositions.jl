@@ -45,7 +45,7 @@ function main(; clear_results=false)
                         json, counter
                     )
 
-                    #@warn "describe data" extract_data_from_json(json, counter)
+                    @warn "describe data" extract_data_from_json(json, counter)
 
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
