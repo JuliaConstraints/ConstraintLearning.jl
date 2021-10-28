@@ -218,7 +218,8 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         Iterators.flatten((solutions, non_sltns))
     else
         l += samples
-        Iterators.flatten((solutions, rand(non_sltns, samples)))
+        sampling_indexes = LHCoptim(samples,1,1)[1]
+        Iterators.flatten((solutions, non_sltns[sampling_indexes]))
     end
     
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
