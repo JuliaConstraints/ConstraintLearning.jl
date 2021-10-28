@@ -38,7 +38,7 @@ function main(; clear_results=false)
                 if isfile(path)
                     @warn "The result file already exist" path
                 else
-                    n_transformations, memoize, population, generations, icn_iterations, partial_search_limit, 
+                    n_symbols, memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
                     selection_rate, dom_size, search, complete_search_limit, 
                     solutions_limit, param = extract_data_from_json(
@@ -60,7 +60,7 @@ function main(; clear_results=false)
 
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
-                    results = @timed loss(file_name, counter, n_transformations, 
+                    results = @timed loss(file_name, counter, 
                         solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
                     )
                     normalised_results = normalise(Symbol(metric), results.value, dom_size)
@@ -87,6 +87,7 @@ function main(; clear_results=false)
                     #push!(comps, "rsd" => rsd(normalised_results))
                     push!(comps, "var" => var(normalised_results, corrected=false))
                     push!(comps, "cov" => cov(normalised_results, corrected=false))
+                    push!(comps, "symbols_count" => n_symbols)
                     export_compositions(comps, path)
                     export_csv(comps, joinpath(datadir("composition_results"), "results.csv"))
                 end
@@ -202,7 +203,7 @@ function generate_file_name(file, counter, symbols_dict)
     return string(file_name, ".json")
 end
 
-function loss(file_name, comp_number, n_transformations, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+function loss(file_name, comp_number, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
         l += length(non_sltns)
@@ -248,7 +249,6 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 # divise par taille de var pour hamming
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
-
 function count_compositions()
     total_compositions = 0
     unique_compositions = 0
@@ -281,4 +281,5 @@ end
 main(;clear_results = true)
 
 
-# TODO:: 
+# TODO:: look into samples (cuz we're using nothing atm)
+# time is different for each composition depending on domain size (solutions, non_solutions)
