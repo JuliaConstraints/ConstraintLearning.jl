@@ -1,3 +1,7 @@
+# TODO:: test learned configs against concrete instances, 
+# outside of training sets, using bigger spaces than used in learning. 
+# maybe use particular strategies for search space exploration, (latin hypercube sampling)
+
 #using Pkg
 #Pkg.add("DrWatson")
 
@@ -29,7 +33,7 @@ function main(; clear_results=false)
     number_of_compositions = 0
     symbols_dict = Dict{String, Int64}()
     #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
-    for file_name in cd(readdir, joinpath(datadir("compositions")))
+    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
@@ -38,6 +42,8 @@ function main(; clear_results=false)
                 if isfile(path)
                     @warn "The result file already exist" path
                 else
+                    touch(path)
+
                     n_symbols, memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
                     selection_rate, dom_size, search, complete_search_limit, 
@@ -119,7 +125,8 @@ function extract_data_from_json(file, counter)
     metric = file["params"]["metric"]
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
-    dom_size = file["params"]["domains_size"]
+    # Add 1 to dom_size to test using different spaces from training
+    dom_size = file["params"]["domains_size"] + 1
     search = eval(Meta.parse(":" * file["params"]["search"]))
     complete_search_limit = file["params"]["complete_search_limit"]
     solutions_limit = file["params"]["sampling"]
@@ -143,7 +150,6 @@ function generate_param(param, dom_size)
 end
 
 function export_compositions(comps, path)
-    touch(path)
     return write(path, JSON.json(comps, 2))
 end
 
@@ -263,9 +269,4 @@ function count_compositions()
     @info "total number of unique compositions: " unique_compositions
 end
 
-
 main(;clear_results = true)
-
-
-# TODO:: look into samples (cuz we're using nothing atm)
-# time is different for each composition depending on domain size (solutions, non_solutions)
