@@ -104,7 +104,7 @@ function main(; clear_results=false)
 end
 
 function extract_data_from_json(file, counter)
-    symbols_count = length(file[string(counter)]["symbols"][1])
+    symbols_count = length(file[string(counter)]["symbols"][1]) + 3
     icn_time = file["icn_time"]
     memoize = file["params"]["memoize"]
     population = file["params"]["population"]
