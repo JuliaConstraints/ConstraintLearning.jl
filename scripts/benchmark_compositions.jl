@@ -60,10 +60,12 @@ function main(; clear_results=false)
 
                     icn_composition_string = comp[findfirst("function", comp)[1]:end]
                     icn_composition = eval(Meta.parse(icn_composition_string))
-                    results = @timed loss(file_name, counter, 
-                        solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=nothing
+                    timed_loss = @timed loss( 
+                        solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=solutions_limit
                     )
-                    normalised_results = normalise(Symbol(metric), results.value, dom_size)
+                    results = timed_loss.value[1]
+                    sol_length = timed_loss.value[2]
+                    normalised_results = normalise(Symbol(metric), results, dom_size)
                     push!(comps, "icn_time" => icn_time)
                     push!(comps, "search" => search)
                     push!(comps, "concept" => temp_concept)
@@ -78,8 +80,8 @@ function main(; clear_results=false)
                     push!(comps, "composition" => comp)
                     push!(comps, "composition_number" => counter)
                     push!(comps, "selection_rate" => selection_rate)
-                    push!(comps, "time" => results.time)
-                    push!(comps, "accuracy" => results.value)
+                    push!(comps, "time" => timed_loss.time/sol_length)
+                    push!(comps, "accuracy" => results)
                     push!(comps, "normalised" => normalised_results)
                     push!(comps, "mean" => mean(normalised_results))
                     push!(comps, "median" => median(normalised_results))
@@ -203,7 +205,7 @@ function generate_file_name(file, counter, symbols_dict)
     return string(file_name, ".json")
 end
 
-function loss(file_name, comp_number, solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     l = length(solutions)
     X = if isnothing(samples)
         l += length(non_sltns)
@@ -213,28 +215,12 @@ function loss(file_name, comp_number, solutions, non_sltns, composition, metric,
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
     
-    #result = map(x -> 0 ,X)
-    try
-        map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
-    catch e
-        @info file_name
-        @info comp_number
-        @info e
-    end
-    #try
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
-        #result =  map(x -> abs(composition(x; X=zeros(length(x), n_transformations), param=param, dom_size=dom_size) - metric(x, solutions)), X)
-    # catch e 
-    #     @info file_name
-    #     @info comp_number
-    #     @info e 
-    # end
-    # Remove last defined version of the compositon, it gives an error for some reason
-    #Base.delete_method(@which composition(x; param, dom_size))
+    
     for m ∈ methods(composition)
         Base.delete_method(m)
     end
-    return result
+    return result, l
 end
 
 
