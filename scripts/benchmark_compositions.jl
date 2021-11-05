@@ -8,6 +8,7 @@
 # Load DrWatson (scientific project manager)
 using DrWatson
 using Statistics
+using LatinHypercubeSampling
 
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
@@ -50,6 +51,7 @@ function main(; clear_results=false)
                     solutions_limit, param = extract_data_from_json(
                         json, counter
                     )
+                    
 
                     @warn "describe data" extract_data_from_json(json, counter)
 
@@ -126,7 +128,7 @@ function extract_data_from_json(file, counter)
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
     # Add 1 to dom_size to test using different spaces from training
-    dom_size = file["params"]["domains_size"] + 1
+    dom_size = 20
     search = eval(Meta.parse(":" * file["params"]["search"]))
     complete_search_limit = file["params"]["complete_search_limit"]
     solutions_limit = file["params"]["sampling"]
@@ -218,8 +220,8 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         Iterators.flatten((solutions, non_sltns))
     else
         l += samples
-        sampling_indexes = LHCoptim(samples,1,1)[1]
-        Iterators.flatten((solutions, non_sltns[sampling_indexes]))
+        sampling_indexes = randomLHC(min(samples,length(non_sltns)),1)
+        Iterators.flatten((solutions, toarray.(non_sltns)[sampling_indexes]))
     end
     
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
@@ -269,5 +271,10 @@ function count_compositions()
     @info "total number of compositions: " total_compositions
     @info "total number of unique compositions: " unique_compositions
 end
+
+
+# Helper functions (Set to Array)
+toarray(s::Union{Set, Vector}) = [toarray.(s)...]
+toarray(v::Number) = v
 
 main(;clear_results = true)

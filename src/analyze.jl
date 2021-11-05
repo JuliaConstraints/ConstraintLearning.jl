@@ -55,14 +55,11 @@ function analyze_composition()
     df = DataFrame()
     for f in filter(x -> endswith(x, ".json"),readdir(datadir("composition_results"); join = true))
         d = JSON.parsefile(f)
-        inds1 = Indices(["icn_iterations", "time", "composition_number", "mean", "std", "icn_time", "memoize", "var", "concept", "partial_search_limit", "sampling", "generations",
+
+        inds1 = Indices(["symbols_count","icn_iterations", "time", "composition_number", "mean", "std", "icn_time", "memoize", "var", "concept", "partial_search_limit", "sampling", "generations",
         "cov", "complete_search_limit", "median", "search", "population", "selection_rate"])
         d1 = view(Dictionary(d),inds1)
-        # inds2 = Indices(["icn_iterations", "loss_sampler", "domains_size", "memoize", "metric", "sampling", "generations", "search", "population", "concept"])
-        # d2 = view(Dictionary(d["params"]), inds2)
-        # d3 = merge(d1, d2)
-        # d3["loss_sampler"] = string(d3["loss_sampler"])
-
+        
         if isempty(df)
             df = DataFrame(Dict(pairs(d1)))
         else

@@ -12,6 +12,7 @@ using Dictionaries
 using DrWatson
 using JSON
 using Tables
+using LatinHypercubeSampling
 
 # imports
 import Constraints: make_error
