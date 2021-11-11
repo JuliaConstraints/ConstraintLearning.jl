@@ -51,60 +51,62 @@ function main(; clear_results=false)
                         json, counter
                     )
                     
-
-                    @warn "describe data" extract_data_from_json(json, counter)
+                    @warn "retrieved data for comp: " maths
 
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
-                    solutions, non_sltns, _ = search_space(
-                        dom_size,
-                        concept,
-                        param;
-                        #search,
-                        search = :partial,
-                        complete_search_limit,
-                        solutions_limit,
-                    )
-
-                    icn_composition_string = comp[findfirst("function", comp)[1]:end]
-                    icn_composition = eval(Meta.parse(icn_composition_string))
-                    timed_loss = @timed loss( 
-                        solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=solutions_limit
-                    )
-                    results = timed_loss.value[1]
-                    sol_length = timed_loss.value[2]
-                    normalised_results = normalise(Symbol(metric), results, dom_size)
-                    push!(comps, "icn_time" => icn_time)
-                    push!(comps, "search" => search)
-                    push!(comps, "concept" => temp_concept)
-                    push!(comps, "complete_search_limit" => complete_search_limit)
-                    push!(comps, "memoize" => memoize)
-                    push!(comps, "sampling" => solutions_limit)
-                    push!(comps, "population" => population)
-                    push!(comps, "generations" => generations)
-                    push!(comps, "icn_iterations" => icn_iterations)
-                    push!(comps, "partial_search_limit" => partial_search_limit)
-                    push!(comps, "maths" => maths)
-                    push!(comps, "composition" => comp)
-                    push!(comps, "composition_number" => counter)
-                    push!(comps, "selection_rate" => selection_rate)
-                    push!(comps, "time" => timed_loss.time/sol_length)
-                    push!(comps, "accuracy" => results)
-                    push!(comps, "normalised" => normalised_results)
-                    push!(comps, "mean" => mean(normalised_results))
-                    push!(comps, "median" => median(normalised_results))
-                    push!(comps, "std" => std(normalised_results, corrected=false))
-                    #push!(comps, "rsd" => rsd(normalised_results))
-                    push!(comps, "var" => var(normalised_results, corrected=false))
-                    push!(comps, "cov" => cov(normalised_results, corrected=false))
-                    push!(comps, "symbols_count" => n_symbols)
-                    export_compositions(comps, path)
-                    export_csv(comps, joinpath(datadir("composition_results"), "results.csv"))
+                    for i in 0:2:3
+                        dom_size = dom_size + 10^i
+                    
+                        solutions, non_sltns, _ = search_space(
+                            dom_size,
+                            concept,
+                            param;
+                            #leave search param flexible by default,
+                            complete_search_limit,
+                            solutions_limit,
+                        )
+                        icn_composition_string = comp[findfirst("function", comp)[1]:end]
+                        icn_composition = eval(Meta.parse(icn_composition_string))
+                        timed_loss = @timed loss( 
+                            solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=solutions_limit
+                        )
+                        results = timed_loss.value[1]
+                        sol_length = timed_loss.value[2]
+                        normalised_results = normalise(Symbol(metric), results, dom_size)
+                        push!(comps, "dom_size" => dom_size)
+                        push!(comps, "icn_time" => icn_time)
+                        push!(comps, "search" => search)
+                        push!(comps, "concept" => temp_concept)
+                        push!(comps, "complete_search_limit" => complete_search_limit)
+                        push!(comps, "memoize" => memoize)
+                        push!(comps, "sampling" => solutions_limit)
+                        push!(comps, "population" => population)
+                        push!(comps, "generations" => generations)
+                        push!(comps, "icn_iterations" => icn_iterations)
+                        push!(comps, "partial_search_limit" => partial_search_limit)
+                        push!(comps, "maths" => maths)
+                        push!(comps, "composition" => comp)
+                        push!(comps, "composition_number" => counter)
+                        push!(comps, "selection_rate" => selection_rate)
+                        push!(comps, "time" => timed_loss.time/sol_length)
+                        push!(comps, "accuracy" => results)
+                        push!(comps, "normalised" => normalised_results)
+                        push!(comps, "mean" => mean(normalised_results))
+                        push!(comps, "median" => median(normalised_results))
+                        push!(comps, "std" => std(normalised_results, corrected=false))
+                        #push!(comps, "rsd" => rsd(normalised_results))
+                        push!(comps, "var" => var(normalised_results, corrected=false))
+                        push!(comps, "cov" => cov(normalised_results, corrected=false))
+                        push!(comps, "symbols_count" => n_symbols)
+                        export_compositions(comps, path)
+                        export_csv(comps, joinpath(datadir("composition_results"), "results.csv"))
+                    end
                 end
                 counter += 1
             end
-            number_of_compositions += counter
-            @info "number of compositions: " number_of_compositions
+            number_of_compositions += counter-1
+            @info "number of compositions processed: " number_of_compositions
         end
     end
 
@@ -127,8 +129,7 @@ function extract_data_from_json(file, counter)
     metric = file["params"]["metric"]
     comp = file[string(counter)]["Julia"]
     selection_rate = file[string(counter)]["selection_rate"]
-    # Add 1 to dom_size to test using different spaces from training
-    dom_size = 1000
+    dom_size = file["params"]["domains_size"]
     search = eval(Meta.parse(":" * file["params"]["search"]))
     complete_search_limit = file["params"]["complete_search_limit"]
     solutions_limit = file["params"]["sampling"]
@@ -152,7 +153,8 @@ function generate_param(param, dom_size)
 end
 
 function export_compositions(comps, path)
-    return write(path, JSON.json(comps, 2))
+    dom_size = comps["dom_size"]
+    return write(path, JSON.json(Dict("$dom_size" => comps), 2))
 end
 
 function export_symbols_dict(symbols_dict::Dict{String, Int64})
@@ -214,18 +216,25 @@ function generate_file_name(file, counter, symbols_dict)
 end
 
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
+    # I think there's a redundancy with sampling here? I'm not sure
+    
     l = length(solutions)
-    X = if isnothing(samples)
+    
+    #@info "n of solutions" l
+
+    # This condition causes problems when N of samples is larger than the number of non-solutions (Fixed)
+    X = if isnothing(samples) || length(non_sltns) < samples
         l += length(non_sltns)
+        #@info "n of solutions + non sol" l
         Iterators.flatten((solutions, non_sltns))
     else
         l += samples
-        #sampling_indexes = randomLHC(min(samples,length(non_sltns)),1)
+        #@info "n of solutions + non sol random" l
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
     
     result =  map(x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)), X)   
-    
+
     for m ∈ methods(composition)
         Base.delete_method(m)
     end
@@ -262,7 +271,7 @@ function count_compositions()
                 end
                 counter += 1
             end
-            total_compositions += counter
+            total_compositions += counter - 1
             unique_compositions += unique_counter
         end
         @info "current number of compositions: " total_compositions

@@ -10,9 +10,11 @@ function search_space(
     # Define the domains by on the domain size
     domains = fill(domain(1:dom_size), dom_size)
 
+    max_samplings = sum(domain_size, domains)
+
     # # Determine if the search is partial or complete
     if search == :flexible
-        search = sum(domain_size, domains) < complete_search_limit ? :complete : :partial
+        search = max_samplings < complete_search_limit ? :complete : :partial
     end
 
     # Define the output folder and make the related path if necessary
@@ -59,7 +61,7 @@ function search_space(
     solutions, non_sltns = if has_data
         read_csv_as_set(file_solutions), read_csv_as_set(file_non_sltns)
     else
-        explore(domains, concept, param; search, solutions_limit)
+        explore(domains, concept, param; search, complete_search_limit, max_samplings, solutions_limit)
     end
 
     # Save the data locally if generated on this run
