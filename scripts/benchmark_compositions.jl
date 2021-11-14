@@ -1,7 +1,3 @@
-# TODO:: test learned configs against concrete instances, 
-# outside of training sets, using bigger spaces than used in learning. 
-# maybe use particular strategies for search space exploration, (latin hypercube sampling)
-
 #using Pkg
 #Pkg.add("DrWatson")
 
@@ -31,22 +27,21 @@ function main(; clear_results=false)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
     symbols_dict = Dict{String, Int64}()
-    #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
     Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
+
+                @info "composition №: " counter
+
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
-                
-                dom_size = json["params"]["domains_size"]
+                dom_size = file["params"]["domains_size"]
                 
                 if isfile(path) && ( haskey(JSON.parsefile(path), string(dom_size+1)) 
                     || haskey(JSON.parsefile(path), string(dom_size+100)) )
                     @warn "The results for this composition already exist" path
                 else
-                    touch(path)
-
                     n_symbols, memoize, population, generations, icn_iterations, partial_search_limit, 
                     icn_time, maths, temp_concept, metric, comp, 
                     selection_rate, dom_size, search, complete_search_limit, 
@@ -296,4 +291,4 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 # divise par taille de var pour hamming
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
-main(;clear_results = true)
+main(;clear_results = false)
