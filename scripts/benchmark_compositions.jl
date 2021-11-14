@@ -24,7 +24,6 @@ using CompositionalNetworks
 using CSV
 using DataFrames
 
-#include(joinpath(projectdir("src"), "search_space.jl"))
 
 function main(; clear_results=false)
     comps = Dict{Any,Any}()
@@ -33,14 +32,14 @@ function main(; clear_results=false)
     number_of_compositions = 0
     symbols_dict = Dict{String, Int64}()
     #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
-    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
+    for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
                 if isfile(path)
-                    @warn "The result file already exist" path
+                    @warn "The results for this composition already exist" path
                 else
                     touch(path)
 
@@ -56,7 +55,9 @@ function main(; clear_results=false)
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
                     for i in 0:2:3
+                        @warn "initial dom_size" dom_size
                         dom_size = dom_size + 10^i
+                        @warn "testing against dom_size" dom_size
                     
                         solutions, non_sltns, _ = search_space(
                             dom_size,
@@ -95,7 +96,6 @@ function main(; clear_results=false)
                         push!(comps, "mean" => mean(normalised_results))
                         push!(comps, "median" => median(normalised_results))
                         push!(comps, "std" => std(normalised_results, corrected=false))
-                        #push!(comps, "rsd" => rsd(normalised_results))
                         push!(comps, "var" => var(normalised_results, corrected=false))
                         push!(comps, "cov" => cov(normalised_results, corrected=false))
                         push!(comps, "symbols_count" => n_symbols)
@@ -154,7 +154,17 @@ end
 
 function export_compositions(comps, path)
     dom_size = comps["dom_size"]
-    return write(path, JSON.json(Dict("$dom_size" => comps), 2))
+    data = json(Dict("$dom_size" => comps), 2)
+    open(path,"a") do f
+        if filesize(path) != 0
+            seekend(f)
+            skip(f, -2)
+            data = string("\n,\n",data[2:end])
+        end
+        write(f, data)
+    end
+    
+    return nothing
 end
 
 function export_symbols_dict(symbols_dict::Dict{String, Int64})
@@ -242,17 +252,6 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
 end
 
 
-# relative standard deviation
-rsd(results) = std(results, corrected=false)/mean(results) 
-
-
-# normalise
-normalise(metric, results, dom_size) = normalise(results, dom_size, Val(metric))
-# divise par taille de variable * nombre de domaine pour manhattan
-normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
-# divise par taille de var pour hamming
-normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
-
 function count_compositions()
     total_compositions = 0
     unique_compositions = 0
@@ -280,5 +279,17 @@ function count_compositions()
     @info "total number of compositions: " total_compositions
     @info "total number of unique compositions: " unique_compositions
 end
+
+
+# relative standard deviation
+rsd(results) = std(results, corrected=false)/mean(results) 
+
+
+# normalise
+normalise(metric, results, dom_size) = normalise(results, dom_size, Val(metric))
+# divise par taille de variable * nombre de domaine pour manhattan
+normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
+# divise par taille de var pour hamming
+normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 main(;clear_results = true)
