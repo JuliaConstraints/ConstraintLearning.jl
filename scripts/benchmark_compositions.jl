@@ -38,7 +38,11 @@ function main(; clear_results=false)
             counter = 1
             while (haskey(json, string(counter)))
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
-                if isfile(path)
+                
+                dom_size = json["params"]["domains_size"]
+                
+                if isfile(path) && ( haskey(JSON.parsefile(path), string(dom_size+1)) 
+                    || haskey(JSON.parsefile(path), string(dom_size+100)) )
                     @warn "The results for this composition already exist" path
                 else
                     touch(path)
