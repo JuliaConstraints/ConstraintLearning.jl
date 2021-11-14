@@ -32,7 +32,7 @@ function main(; clear_results=false)
     number_of_compositions = 0
     symbols_dict = Dict{String, Int64}()
     #Threads.@threads for some reason causes => nested task error: UndefRefError: access to undefined reference
-    @Threads.threads for file_name in cd(readdir, joinpath(datadir("compositions")))
+    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
