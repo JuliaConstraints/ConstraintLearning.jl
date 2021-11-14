@@ -36,7 +36,7 @@ function main(; clear_results=false)
                 @info "composition №: " counter
 
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
-                dom_size = file["params"]["domains_size"]
+                dom_size = json["params"]["domains_size"]
                 
                 if isfile(path) && ( haskey(JSON.parsefile(path), string(dom_size+1)) 
                     || haskey(JSON.parsefile(path), string(dom_size+100)) )
