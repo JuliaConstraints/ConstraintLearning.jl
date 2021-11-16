@@ -20,6 +20,7 @@ using CompositionalNetworks
 using CSV
 using DataFrames
 
+@info "Using" Threads.nthreads() "threads"
 
 function main(; clear_results=false)
     comps = Dict{Any,Any}()
@@ -27,13 +28,14 @@ function main(; clear_results=false)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
     symbols_dict = Dict{String, Int64}()
-    Threads.@threads for file_name in cd(readdir, joinpath(datadir("compositions")))
+    # Threads.@threads still causing problems...
+    for file_name in cd(readdir, joinpath(datadir("compositions")))
         if startswith(file_name, "con=")
             json = JSON.parsefile(joinpath(datadir("compositions"), file_name))
             counter = 1
             while (haskey(json, string(counter)))
 
-                @info "composition №: " counter
+                @info "composition №: " counter "thread id: " Threads.threadid()
 
                 path = joinpath(datadir("composition_results"), generate_file_name(json, counter, symbols_dict))
                 dom_size = json["params"]["domains_size"]
@@ -66,11 +68,17 @@ function main(; clear_results=false)
                             complete_search_limit,
                             solutions_limit,
                         )
+
+                        @info "search space retrieved"
+
                         icn_composition_string = comp[findfirst("function", comp)[1]:end]
                         icn_composition = eval(Meta.parse(icn_composition_string))
                         timed_loss = @timed loss( 
                             solutions, non_sltns, icn_composition, eval(Meta.parse(metric)), dom_size, param; samples=solutions_limit
                         )
+
+                        @info "loss calculated"
+                        
                         results = timed_loss.value[1]
                         sol_length = timed_loss.value[2]
                         normalised_results = normalise(Symbol(metric), results, dom_size)
@@ -167,8 +175,7 @@ function export_compositions(comps, path)
 end
 
 function export_symbols_dict(symbols_dict::Dict{String, Int64})
-    path = joinpath(datadir("composition_results"), "sybols_dict.csv")
-    
+    path = joinpath(datadir("composition_results"), "symbols_dict.csv")
     CSV.write(path, DataFrame(symbols_dict))
 
 end
@@ -224,21 +231,15 @@ function generate_file_name(file, counter, symbols_dict)
     return string(file_name, ".json")
 end
 
+# Calculate the loss of a composition
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
-    # I think there's a redundancy with sampling here? I'm not sure
-    
+    @info "started calculating loss"
     l = length(solutions)
-    
-    #@info "n of solutions" l
-
-    # This condition causes problems when N of samples is larger than the number of non-solutions (Fixed)
     X = if isnothing(samples) || length(non_sltns) < samples
         l += length(non_sltns)
-        #@info "n of solutions + non sol" l
         Iterators.flatten((solutions, non_sltns))
     else
         l += samples
-        #@info "n of solutions + non sol random" l
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
     
@@ -291,4 +292,4 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 # divise par taille de var pour hamming
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
-main(;clear_results = false)
+main(;clear_results = true)
