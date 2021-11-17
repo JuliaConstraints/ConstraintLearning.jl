@@ -1,14 +1,13 @@
 using Pkg
-#Pkg.add("DrWatson")
+Pkg.add("DrWatson")
 
 # Load DrWatson (scientific project manager)
-#using DrWatson
+using DrWatson
 
 # Activate the ICNBenchmarks project
-#@quickactivate "ICNBenchmarks"
+@quickactivate "ICNBenchmarks"
 
-Pkg.instantiate()
-# Pkg.update()
+# Pkg.instantiate()
 
 # Load common code to all script in ICNBenchmarks
 using ICNBenchmarks
