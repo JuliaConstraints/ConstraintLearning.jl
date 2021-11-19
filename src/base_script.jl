@@ -4,6 +4,8 @@ Pkg.add("DrWatson")
 # Load DrWatson (scientific project manager)
 using DrWatson
 
+using SharedArrays
+
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
 

@@ -5,6 +5,10 @@ function compositions_benchmark(; clear_results=false)
     mkpath(datadir("composition_results"))
     number_of_compositions = 0
     symbols_dict = Dict{String,Int64}()
+    n_compositions_files = length(readdir(datadir("compositions")))
+    # multiplyin by 2 because for each dom_size used in training, we use 2 for testing
+    #configs_channel = Channel{Int}(n_compositions_files*2);
+    search_space_SA = SharedVector{Int}(n_compositions_files*2)
 
     function aux(file_name)
         if startswith(file_name, "con=")
@@ -39,6 +43,7 @@ function compositions_benchmark(; clear_results=false)
                         @warn "testing against dom_size" dom_size
 
                         solutions, non_sltns, _ = search_space(
+                            search_space_SA,
                             dom_size,
                             concept,
                             param;
@@ -46,6 +51,8 @@ function compositions_benchmark(; clear_results=false)
                             complete_search_limit,
                             solutions_limit,
                         )
+
+                        #write_configs(configs_channel)
 
                         @info "search space retrieved"
 

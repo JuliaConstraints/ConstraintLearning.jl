@@ -1,5 +1,6 @@
 
 function search_space(
+    search_space_SA::SharedVector{Int64},
     dom_size,
     concept,
     param=nothing;
@@ -7,6 +8,7 @@ function search_space(
     complete_search_limit=1000,
     solutions_limit=100,
 )
+
     # Define the domains by on the domain size
     domains = fill(domain(1:dom_size), dom_size)
 
@@ -58,20 +60,31 @@ function search_space(
     end
 
     # Load or compute the exploration of the search space
-    solutions, non_sltns = if has_data
-        read_csv_as_set(file_solutions), read_csv_as_set(file_non_sltns)
+    solutions, non_sltns = Set{Vector{Int}}(), Set{Vector{Int}}()
+    if has_data
+        solutions, non_sltns = read_csv_as_set(file_solutions), read_csv_as_set(file_non_sltns)
     else
-        explore(domains, concept, param; search, complete_search_limit, max_samplings, solutions_limit)
-    end
-
-    # Save the data locally if generated on this run
-    if !has_data
-        files = [file_solutions, file_non_sltns]
-        configs = [solutions, non_sltns]
-        for (file, config) in zip(files, configs), x in config
-            CSV.write(file, Tables.table(reshape(x, (1, length(x)))); append=true)
+        if dom_size ∉ search_space_SA
+            # add dom_size to SharedArray
+            sort!(search_space_SA)
+            search_space_SA[1] = dom_size
+            solutions, non_sltns = explore(domains, concept, param; search, complete_search_limit, max_samplings, solutions_limit)
+            files = [file_solutions, file_non_sltns]
+            configs = [solutions, non_sltns]
+            for (file, config) in zip(files, configs), x in config
+                CSV.write(file, Tables.table(reshape(x, (1, length(x)))); append=true)
+            end
         end
     end
 
     return solutions, non_sltns, has_data
 end
+
+# function write_configs(c::Channel)
+#     for (file, x) in c
+#         CSV.write(file, Tables.table(reshape(x, (1, length(x)))); append=true)
+#     end
+# end
+
+# 681KB, 6 files in search space
+
