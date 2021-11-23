@@ -39,7 +39,7 @@ function compositions_benchmark(; clear_results=false)
 
                     for i in [1,100-dom_size]
                         @warn "initial dom_size" dom_size
-                        dom_size = dom_size + 10^i
+                        dom_size = dom_size + i
                         @warn "testing against dom_size" dom_size
 
                         solutions, non_sltns, _ = search_space(
