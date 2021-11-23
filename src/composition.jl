@@ -313,3 +313,9 @@ end
 
 # relative standard deviation
 rsd(results) = std(results; corrected=false) / mean(results)
+
+open("")
+
+# TODO:: create exclusive
+# TODO:: cleanup script
+# TODO:: add dom_size to comp benchmark file name

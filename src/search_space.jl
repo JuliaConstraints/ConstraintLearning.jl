@@ -64,10 +64,8 @@ function search_space(
     if has_data
         solutions, non_sltns = read_csv_as_set(file_solutions), read_csv_as_set(file_non_sltns)
     else
-        if dom_size ∉ search_space_SA
-            # add dom_size to SharedArray
-            sort!(search_space_SA)
-            search_space_SA[1] = dom_size
+        file_solutions, file_non_sltns = tryopen_exclusive(file_solutions), tryopen_exclusive(file_non_sltns)
+        if (!isnothing(file_solutions) && !isnothing(file_non_sltns))
             solutions, non_sltns = explore(domains, concept, param; search, complete_search_limit, max_samplings, solutions_limit)
             files = [file_solutions, file_non_sltns]
             configs = [solutions, non_sltns]
