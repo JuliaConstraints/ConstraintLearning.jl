@@ -37,7 +37,7 @@ function compositions_benchmark(; clear_results=false)
 
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
-                    for i in 0:2:3
+                    for i in [1,100-dom_size]
                         @warn "initial dom_size" dom_size
                         dom_size = dom_size + 10^i
                         @warn "testing against dom_size" dom_size
