@@ -140,16 +140,10 @@ normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 ## SECTION - Exports
 function export_compositions(comps, path)
-    # dom_size = comps["dom_size"]
-    # data = json(Dict("$dom_size" => comps), 2)
-    # open(path, "a") do f
-    #     if filesize(path) != 0
-    #         seekend(f)
-    #         skip(f, -2)
-    #         data = string("\n,\n", data[2:end])
-    #     end
-    write(path, JSON.json(comps, 2))
-    # end
+    
+    if (!isnothing(path))
+        write(path, JSON.json(comps, 2))
+    end
 
     return nothing
 end
