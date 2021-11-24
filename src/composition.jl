@@ -8,6 +8,7 @@ using Base.Filesystem:
 
 ## SECTION - Becnhmarks compositions
 function compositions_benchmark(; clear_results=false)
+    
     comps = Dict{Any,Any}()
     clear_results && rm(datadir("composition_results"); recursive=true, force=true)
     mkpath(datadir("composition_results"))
@@ -16,7 +17,7 @@ function compositions_benchmark(; clear_results=false)
     n_compositions_files = length(readdir(datadir("compositions")))
     # multiplyin by 2 because for each dom_size used in training, we use 2 for testing
     #configs_channel = Channel{Int}(n_compositions_files*2);
-    search_space_SA = SharedVector{Int}(n_compositions_files*2)
+    #search_space_SA = SharedVector{Int}(n_compositions_files*2)
 
     function aux(file_name)
         if startswith(file_name, "con=")
@@ -53,7 +54,7 @@ function compositions_benchmark(; clear_results=false)
                         @warn "testing against dom_size" dom_size
 
                         solutions, non_sltns, _ = search_space(
-                            search_space_SA,
+                            #search_space_SA,
                             dom_size,
                             concept,
                             param;
@@ -120,7 +121,7 @@ function compositions_benchmark(; clear_results=false)
         end
     end
 
-    pmap(aux, readdir(datadir("compositions")))
+    pmap(aux, shuffle(readdir(datadir("compositions"))))
 
     export_symbols_dict(symbols_dict)
 

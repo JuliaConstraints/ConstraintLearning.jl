@@ -1,10 +1,10 @@
-using Pkg
-Pkg.add("DrWatson")
+#using Pkg
+#Pkg.add("DrWatson")
 
 # Load DrWatson (scientific project manager)
 using DrWatson
 
-using SharedArrays
+#using SharedArrays
 
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
@@ -21,6 +21,8 @@ using Base:
 using Base.Filesystem:
     File, open, JL_O_CREAT, JL_O_RDWR, JL_O_RDONLY, JL_O_EXCL,
     samefile
+
+using Random
 
 # Helper function to open files in O_EXCL mode
 function tryopen_exclusive(path::String, mode::Integer = 0o666)

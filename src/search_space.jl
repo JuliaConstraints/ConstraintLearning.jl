@@ -1,6 +1,6 @@
 
 function search_space(
-    search_space_SA::SharedVector{Int64},
+    #search_space_SA::SharedVector{Int64},
     dom_size,
     concept,
     param=nothing;

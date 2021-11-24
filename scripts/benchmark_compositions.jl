@@ -3,4 +3,8 @@ include(joinpath(dirname(@__DIR__), "src", "distributed_script.jl"))
 
 @info "Using $(Distributed.nworkers()) workers"
 
-compositions_benchmark(; clear_results=false)
+if isempty(ARGS)
+    compositions_benchmark(; clear_results=false)
+else if (ARGS[1] == "true")
+    compositions_benchmark(; clear_results=true)
+end
