@@ -1,3 +1,11 @@
+using Base:
+    IOError, UV_EEXIST, UV_ESRCH,
+    Process
+
+using Base.Filesystem:
+    File, open, JL_O_CREAT, JL_O_RDWR, JL_O_RDONLY, JL_O_EXCL,
+    samefile
+
 ## SECTION - Becnhmarks compositions
 function compositions_benchmark(; clear_results=false)
     comps = Dict{Any,Any}()
@@ -24,10 +32,10 @@ function compositions_benchmark(; clear_results=false)
                                 joinpath(datadir("composition_results"),fn2)
 
                 if isfile(path1) && isfile(path2)
-                    @warn "The results for this composition already exist" path
+                    @warn "The results for this composition already exist"
                 else
                     path1, path2 = tryopen_exclusive(path1), tryopen_exclusive(path2)
-                    
+
                     n_symbols, memoize, population, generations, icn_iterations, 
                     partial_search_limit, icn_time, maths, temp_concept, metric, 
                     comp, selection_rate, dom_size, search, complete_search_limit, 
@@ -212,8 +220,8 @@ function generate_file_name(file, counter, symbols_dict, dom_size)
         end
         file_name = string(file_name, "_", symbols_dict[transformation])
     end
-    path1 =  string(file_name,"_" ,string(dom_size+1),".json")
-    path2 =  string(file_name, "_100",".json")
+    path1 =  string(file_name,"_dom_size_" ,string(dom_size+1),".json")
+    path2 =  string(file_name, "_dom_size_100",".json")
     return path1, path2
 end
 
@@ -318,6 +326,17 @@ end
 
 # relative standard deviation
 rsd(results) = std(results; corrected=false) / mean(results)
+
+
+# Helper function to open files in O_EXCL mode
+function tryopen_exclusive(path::String, mode::Integer = 0o666)
+    try
+        return open(path, JL_O_RDWR | JL_O_CREAT | JL_O_EXCL, mode)
+    catch ex
+        (isa(ex, IOError) && ex.code == UV_EEXIST) || rethrow(ex)
+    end
+    return nothing
+end
 
 
 # TODO:: create exclusive

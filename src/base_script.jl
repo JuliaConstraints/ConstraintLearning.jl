@@ -14,6 +14,14 @@ using SharedArrays
 # Load common code to all script in ICNBenchmarks
 using ICNBenchmarks
 
+using Base:
+    IOError, UV_EEXIST, UV_ESRCH,
+    Process
+
+using Base.Filesystem:
+    File, open, JL_O_CREAT, JL_O_RDWR, JL_O_RDONLY, JL_O_EXCL,
+    samefile
+
 # Helper function to open files in O_EXCL mode
 function tryopen_exclusive(path::String, mode::Integer = 0o666)
     try
