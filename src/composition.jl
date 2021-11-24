@@ -17,19 +17,21 @@ function compositions_benchmark(; clear_results=false)
             while (haskey(json, string(counter)))
                 @info "composition №: $counter, worker: $(myid())"
 
-                path = joinpath(
-                    datadir("composition_results"),
-                    generate_file_name(json, counter, symbols_dict),
-                )
                 dom_size = json["params"]["domains_size"]
 
-                if isfile(path) && (
-                    haskey(JSON.parsefile(path), string(dom_size + 1)) ||
-                    haskey(JSON.parsefile(path), string(dom_size + 100))
-                )
+                fn1, fn2 = generate_file_name(json, counter, symbols_dict, dom_size)
+                path1, path2 = joinpath(datadir("composition_results"),fn1),
+                                joinpath(datadir("composition_results"),fn2)
+
+                if isfile(path1) && isfile(path2)
                     @warn "The results for this composition already exist" path
                 else
-                    n_symbols, memoize, population, generations, icn_iterations, partial_search_limit, icn_time, maths, temp_concept, metric, comp, selection_rate, dom_size, search, complete_search_limit, solutions_limit, param = extract_data_from_json(
+                    path1, path2 = tryopen_exclusive(path1), tryopen_exclusive(path2)
+                    
+                    n_symbols, memoize, population, generations, icn_iterations, 
+                    partial_search_limit, icn_time, maths, temp_concept, metric, 
+                    comp, selection_rate, dom_size, search, complete_search_limit, 
+                    solutions_limit, param = extract_data_from_json(
                         json, counter
                     )
 
@@ -97,7 +99,7 @@ function compositions_benchmark(; clear_results=false)
                         push!(comps, "var" => var(normalised_results; corrected=false))
                         push!(comps, "cov" => cov(normalised_results; corrected=false))
                         push!(comps, "symbols_count" => n_symbols)
-                        export_compositions(comps, path)
+                        i ==1 ? export_compositions(comps, path1) : export_compositions(comps, path2)
                         export_csv(
                             comps, joinpath(datadir("composition_results"), "results.csv")
                         )
@@ -129,18 +131,17 @@ normalise(results, dom_size, ::Val{:manhattan}) = results / dom_size^2
 normalise(results, dom_size, ::Val{:hamming}) = results / dom_size
 
 ## SECTION - Exports
-
 function export_compositions(comps, path)
-    dom_size = comps["dom_size"]
-    data = json(Dict("$dom_size" => comps), 2)
-    open(path, "a") do f
-        if filesize(path) != 0
-            seekend(f)
-            skip(f, -2)
-            data = string("\n,\n", data[2:end])
-        end
-        write(f, data)
-    end
+    # dom_size = comps["dom_size"]
+    # data = json(Dict("$dom_size" => comps), 2)
+    # open(path, "a") do f
+    #     if filesize(path) != 0
+    #         seekend(f)
+    #         skip(f, -2)
+    #         data = string("\n,\n", data[2:end])
+    #     end
+    write(path, JSON.json(comps, 2))
+    # end
 
     return nothing
 end
@@ -190,7 +191,7 @@ function generate_param(param, dom_size)
     return param
 end
 
-function generate_file_name(file, counter, symbols_dict)
+function generate_file_name(file, counter, symbols_dict, dom_size)
     concept = file["params"]["concept"][1]
     symbols = file[string(counter)]["symbols"]
 
@@ -211,7 +212,9 @@ function generate_file_name(file, counter, symbols_dict)
         end
         file_name = string(file_name, "_", symbols_dict[transformation])
     end
-    return string(file_name, ".json")
+    path1 =  string(file_name,"_" ,string(dom_size+1),".json")
+    path2 =  string(file_name, "_100",".json")
+    return path1, path2
 end
 
 ## SECTION - Other utility functions
@@ -272,6 +275,8 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         X,
     )
 
+    @info "loss calculated"
+
     for m in methods(composition)
         Base.delete_method(m)
     end
@@ -291,7 +296,7 @@ function count_compositions()
             while (haskey(json, string(counter)))
                 path = joinpath(
                     datadir("composition_results"),
-                    generate_file_name(json, counter, symbols_dict),
+                    #generate_file_name(json, counter, symbols_dict),
                 )
                 if path ∉ existing_comps
                     unique_counter += 1
