@@ -5,6 +5,6 @@ include(joinpath(dirname(@__DIR__), "src", "distributed_script.jl"))
 
 if isempty(ARGS)
     compositions_benchmark(; clear_results=false)
-else if (ARGS[1] == "true")
+elseif (ARGS[1] == "true")
     compositions_benchmark(; clear_results=true)
 end

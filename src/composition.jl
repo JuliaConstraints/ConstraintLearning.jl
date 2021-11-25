@@ -48,8 +48,8 @@ function compositions_benchmark(; clear_results=false)
 
                     concept = Constraints.concept(BENCHED_CONSTRAINTS[temp_concept])
 
+                    @warn "initial dom_size" dom_size
                     for i in [1,100-dom_size]
-                        @warn "initial dom_size" dom_size
                         dom_size = dom_size + i
                         @warn "testing against dom_size" dom_size
 
@@ -78,8 +78,6 @@ function compositions_benchmark(; clear_results=false)
                             param;
                             samples=solutions_limit,
                         )
-
-                        @info "loss calculated"
 
                         results = timed_loss.value[1]
                         sol_length = timed_loss.value[2]
