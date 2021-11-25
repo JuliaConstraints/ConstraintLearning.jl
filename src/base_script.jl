@@ -6,13 +6,15 @@ using DrWatson
 
 #using SharedArrays
 
+
+# Load common code to all script in ICNBenchmarks
+using ICNBenchmarks
+
+
 # Activate the ICNBenchmarks project
 @quickactivate "ICNBenchmarks"
 
 # Pkg.instantiate()
-
-# Load common code to all script in ICNBenchmarks
-using ICNBenchmarks
 
 using Base:
     IOError, UV_EEXIST, UV_ESRCH,
