@@ -6,6 +6,8 @@ using Base.Filesystem:
     File, open, JL_O_CREAT, JL_O_RDWR, JL_O_RDONLY, JL_O_EXCL,
     samefile
 
+using Random
+
 ## SECTION - Becnhmarks compositions
 function compositions_benchmark(; clear_results=false)
     
@@ -107,9 +109,9 @@ function compositions_benchmark(; clear_results=false)
                         push!(comps, "cov" => cov(normalised_results; corrected=false))
                         push!(comps, "symbols_count" => n_symbols)
                         i ==1 ? export_compositions(comps, path1) : export_compositions(comps, path2)
-                        export_csv(
-                            comps, joinpath(datadir("composition_results"), "results.csv")
-                        )
+                        # export_csv(
+                        #     comps, joinpath(datadir("composition_results"), "results.csv")
+                        # )
                     end
                 end
                 counter += 1
