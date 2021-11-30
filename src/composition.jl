@@ -105,13 +105,13 @@ function compositions_benchmark(; clear_results=false)
                         try
                         push!(comps, "mean" => mean(normalised_results))
                         catch e
-                            @info "########################## l9lawi ##########################"
+                            @info "########################## DEBUG ##########################"
                             println(normalised_results)
-                            @info "########################## l9lawi ##########################"
+                            @info "########################## DEBUG ##########################"
                             println(results)
-                            @info "########################## l9lawi ##########################"
+                            @info "########################## DEBUG ##########################"
                             println(timed_loss)
-                            @info "########################## l9lawi ##########################"
+                            @info "########################## DEBUG ##########################"
                         end
                         push!(comps, "median" => median(normalised_results))
                         push!(comps, "std" => std(normalised_results; corrected=false))
