@@ -15,7 +15,7 @@ using JSON
 using Statistics
 using StatsBase
 using Tables
-using SharedArrays
+#using SharedArrays
 
 # imports
 import Constraints: make_error

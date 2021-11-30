@@ -62,13 +62,26 @@ function search_space(
     # Load or compute the exploration of the search space
     solutions, non_sltns = Set{Vector{Int}}(), Set{Vector{Int}}()
     if has_data
+        @warn "has data"
         solutions, non_sltns = read_csv_as_set(file_solutions), read_csv_as_set(file_non_sltns)
     else
+        @warn "doesn't have data, generating solutions & non_solutions...."
         file_solutions, file_non_sltns = tryopen_exclusive(file_solutions), tryopen_exclusive(file_non_sltns)
-        if (!isnothing(file_solutions) && !isnothing(file_non_sltns))
-            solutions, non_sltns = explore(domains, concept, param; search, complete_search_limit, max_samplings, solutions_limit)
-            files = [file_solutions, file_non_sltns]
-            configs = [solutions, non_sltns]
+        if (!isnothing(file_solutions))
+            solutions, non_sltns = explore(domains, concept, param; 
+                search, complete_search_limit, max_samplings, solutions_limit)
+            files = [file_solutions]
+            configs = [solutions]
+            for (file, config) in zip(files, configs), x in config
+                CSV.write(file, Tables.table(reshape(x, (1, length(x)))); append=true)
+            end
+        end
+
+        if (!isnothing(file_non_sltns))
+            # solutions, non_sltns = explore(domains, concept, param; 
+            #     search, complete_search_limit, max_samplings, solutions_limit)
+            files = [file_non_sltns]
+            configs = [non_sltns]
             for (file, config) in zip(files, configs), x in config
                 CSV.write(file, Tables.table(reshape(x, (1, length(x)))); append=true)
             end
@@ -85,4 +98,3 @@ end
 # end
 
 # 681KB, 6 files in search space
-

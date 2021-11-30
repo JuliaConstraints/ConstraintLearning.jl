@@ -102,7 +102,17 @@ function compositions_benchmark(; clear_results=false)
                         push!(comps, "time" => timed_loss.time / sol_length)
                         push!(comps, "accuracy" => results)
                         push!(comps, "normalised" => normalised_results)
+                        try
                         push!(comps, "mean" => mean(normalised_results))
+                        catch e
+                            @info "########################## l9lawi ##########################"
+                            println(normalised_results)
+                            @info "########################## l9lawi ##########################"
+                            println(results)
+                            @info "########################## l9lawi ##########################"
+                            println(timed_loss)
+                            @info "########################## l9lawi ##########################"
+                        end
                         push!(comps, "median" => median(normalised_results))
                         push!(comps, "std" => std(normalised_results; corrected=false))
                         push!(comps, "var" => var(normalised_results; corrected=false))
@@ -121,7 +131,8 @@ function compositions_benchmark(; clear_results=false)
         end
     end
 
-    pmap(aux, shuffle(readdir(datadir("compositions"))))
+    #pmap(aux, shuffle(readdir(datadir("compositions"))))
+    map(aux, Random.shuffle(readdir(datadir("compositions"))))
 
     export_symbols_dict(symbols_dict)
 
@@ -264,6 +275,8 @@ end
 # Calculate the loss of a composition
 function loss(solutions, non_sltns, composition, metric, dom_size, param; samples=nothing)
     @info "started calculating loss"
+    @warn "solutions: " solutions  
+    @warn "non_sltns: " non_sltns
     l = length(solutions)
     X = if isnothing(samples) || length(non_sltns) < samples
         l += length(non_sltns)
@@ -272,6 +285,8 @@ function loss(solutions, non_sltns, composition, metric, dom_size, param; sample
         l += samples
         Iterators.flatten((solutions, rand(non_sltns, samples)))
     end
+
+    @warn "X: " X
 
     result = map(
         x -> abs(Base.invokelatest(composition, x; param, dom_size) - metric(x, solutions)),
