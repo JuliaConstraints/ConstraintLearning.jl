@@ -25,6 +25,7 @@ function make_training_sets(X, penalty, p)
     return solutions, non_sltns
 end
 
+# REVIEW - Is it correct? Make a CI test
 function make_training_sets(X, penalty::Vector{T}, p) where {T <: Real}
     f = isnothing(param) ? ((x; param = p) -> penalty(x)) : penalty
 

@@ -1,27 +1,54 @@
-# function icn(domains, penalty, param, ::Val{:ga})
-#     return composition(explore_learn_compose(domains, penalty, param)[1])
-# end
-
-function icn(
-    domains::Vector{D},
-    penalty::F,
-    param = nothing;
-    optimiser = :ga,
-    X_test = nothing,
-) where {D <: AbstractDomain, F <: Function}
-    return composition(explore_learn_compose(domains, penalty, param)[1])
-end
-
 function icn(
     X,
     X̅,
     param = nothing;
     discrete = true,
     dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅), discrete),
-    optimiser = :ga,
-    X_test = nothing
+    metric=:hamming,
+    optimizer = GeneticOptimizer(),
+    X_test = nothing,
 )
-    return composition(learn_compose(X, X̅, dom_size; param)[1])
+    lc = learn_compose(
+        X,
+        X̅,
+        dom_size,
+        param;
+        metric,
+        optimizer
+    )[1]
+    return composition(lc)
+end
+
+function icn(
+    domains::Vector{D},
+    penalty::F,
+    param = nothing;
+    complete_search_limit=1000,
+    search=:flexible,
+    solutions_limit=100,
+    configurations=explore(
+        domains, penalty, param; search, complete_search_limit, solutions_limit
+    ),
+    discrete=true,
+    dom_size = δ(
+        Iterators.flatten(configurations[1]),
+        Iterators.flatten(configurations[2]),
+        discrete,
+    ),
+    metric=:hamming,
+    optimizer = GeneticOptimizer(),
+    X_test = nothing,
+) where {D <: AbstractDomain, F <: Function}
+    return icn(
+        configurations[1],
+        configurations[2],
+        param;
+        discrete,
+        dom_size,
+        metric,
+        optimizer,
+        X_test,
+    )
 end
 
 function icn(
@@ -30,22 +57,19 @@ function icn(
     param = nothing;
     discrete = true,
     dom_size = δ(Iterators.flatten(X), discrete),
-    optimiser = :ga,
+    metric=:hamming,
+    optimizer = GeneticOptimizer(),
     X_test = nothing,
 ) where {F <: Function}
     solutions, non_sltns = make_training_sets(X, penalty, param)
-    return icn(solutions, non_sltns, param; dom_size, optimiser, X_test)
-end
-
-function icn(
-    X,
-    penalty::Vector{T},
-    param = nothing;
-    discrete = true,
-    dom_size = δ(Iterators.flatten(X), discrete),
-    optimiser = :ga,
-    X_test = nothing,
-) where {T <: Real}
-    solutions, non_sltns = make_training_sets(X, penalty, param)
-    return icn(solutions, non_sltns, param; dom_size, optimiser, X_test)
+    return icn(
+        solutions,
+        non_sltns,
+        param;
+        discrete,
+        dom_size,
+        metric,
+        optimizer,
+        X_test,
+    )
 end
