@@ -14,7 +14,8 @@ function icn(
         dom_size,
         param;
         metric,
-        optimizer
+        optimizer,
+        X_test,
     )[1]
     return composition(lc)
 end
