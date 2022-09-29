@@ -4,28 +4,15 @@ function qubo(domains, penalty, param, ml, ::Val{:ga})
 end
 
 function qubo(
-    X_train,
+    X,
     penalty,
     param = nothing;
-    icn = :none,
-    ml = :descent,
-    opt = x -> 0.,
-    X_check = X_train
+    icn = nothing,
+    optimizer = GradientDescentOptimizer(),
+    X_check = X,
 )
     n = length(first(X_train))
     # N = n^2
     Q = zeros(n, n)
     return train!(Q, X_train, penalty, opt; X_check)
-end
-
-function qubo(
-    domains::Vector{D},
-    penalty::F,
-    param = nothing;
-    icn = :none,
-    ml = :default,
-    opt = x -> 0.,
-    X_test = nothing,
-)  where {D <: AbstractDomain, F <: Function}
-
 end
