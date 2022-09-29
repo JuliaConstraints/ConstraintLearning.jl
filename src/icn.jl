@@ -1,3 +1,8 @@
+struct ICNConfig{O <: CompositionalNetworks.AbstractOptimizer}
+    metric::Function
+    optimizer::O
+end
+
 function icn(
     X,
     X̅,
@@ -24,12 +29,7 @@ function icn(
     domains::Vector{D},
     penalty::F,
     param = nothing;
-    complete_search_limit=1000,
-    search=:flexible,
-    solutions_limit=100,
-    configurations=explore(
-        domains, penalty, param; search, complete_search_limit, solutions_limit
-    ),
+    configurations=explore(domains, penalty; param),
     discrete=true,
     dom_size = δ(
         Iterators.flatten(configurations[1]),
