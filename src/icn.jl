@@ -1,16 +1,20 @@
 struct ICNConfig{O <: CompositionalNetworks.AbstractOptimizer}
-    metric::Function
+    metric::Symbol
     optimizer::O
+end
+
+function ICNConfig(; metric = :hamming, optimizer = GeneticOptimizer())
+    return ICNConfig(metric, optimizer)
 end
 
 function icn(
     X,
-    X̅,
-    param = nothing;
+    X̅;
     discrete = true,
-    dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅), discrete),
-    metric=:hamming,
+    dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅); discrete),
+    metric = :hamming,
     optimizer = GeneticOptimizer(),
+    param = nothing,
     X_test = nothing,
 )
     lc = learn_compose(
@@ -27,13 +31,13 @@ end
 
 function icn(
     domains::Vector{D},
-    penalty::F,
-    param = nothing;
-    configurations=explore(domains, penalty; param),
-    discrete=true,
+    penalty::F;
+    param = nothing,
+    configurations = explore(domains, penalty; param),
+    discrete = true,
     dom_size = δ(
         Iterators.flatten(configurations[1]),
-        Iterators.flatten(configurations[2]),
+        Iterators.flatten(configurations[2]);
         discrete,
     ),
     metric=:hamming,
@@ -42,8 +46,8 @@ function icn(
 ) where {D <: AbstractDomain, F <: Function}
     return icn(
         configurations[1],
-        configurations[2],
-        param;
+        configurations[2];
+        param,
         discrete,
         dom_size,
         metric,
@@ -54,19 +58,19 @@ end
 
 function icn(
     X,
-    penalty::F,
-    param = nothing;
+    penalty::F;
     discrete = true,
-    dom_size = δ(Iterators.flatten(X), discrete),
-    metric=:hamming,
+    dom_size = δ(Iterators.flatten(X); discrete),
+    metric = :hamming,
     optimizer = GeneticOptimizer(),
+    param = nothing,
     X_test = nothing,
 ) where {F <: Function}
-    solutions, non_sltns = make_training_sets(X, penalty, param)
+    solutions, non_sltns = make_training_sets(X, penalty, param, dom_size)
     return icn(
         solutions,
-        non_sltns,
-        param;
+        non_sltns;
+        param,
         discrete,
         dom_size,
         metric,

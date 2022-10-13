@@ -65,8 +65,9 @@ end
         @testset "$(config[:info])" begin
             println("\nTest for $(config[:info])")
             penalty = x -> all_different(x, config[:encoding], config[:binarization])
-            optimizer = GradientDescentOptimizer(binarization = config[:binarization])
-            train(config[:train], penalty; optimizer, X_test = config[:test])
+            optimizer = GradientDescentOptimizer(; binarization = config[:binarization])
+            qubo(config[:train], penalty; optimizer, X_test = config[:test])
+            # qubo(config[:train], penalty; optimizer, X_test = config[:test], icn_conf = ICNConfig())
         end
     end
 end

@@ -9,6 +9,8 @@ using QUBOConstraints
 export icn
 export qubo
 
+export ICNConfig
+
 # SECTION - includes
 include("common.jl")
 include("icn.jl")
