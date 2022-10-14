@@ -1,19 +1,10 @@
-struct ICNConfig{O <: CompositionalNetworks.AbstractOptimizer}
-    metric::Symbol
-    optimizer::O
-end
-
-function ICNConfig(; metric = :hamming, optimizer = GeneticOptimizer())
-    return ICNConfig(metric, optimizer)
-end
-
 function icn(
     X,
     X̅;
     discrete = true,
     dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅); discrete),
     metric = :hamming,
-    optimizer = GeneticOptimizer(),
+    optimizer = ICNGeneticOptimizer(),
     param = nothing,
     X_test = nothing,
 )
@@ -41,7 +32,7 @@ function icn(
         discrete,
     ),
     metric=:hamming,
-    optimizer = GeneticOptimizer(),
+    optimizer = ICNGeneticOptimizer(),
     X_test = nothing,
 ) where {D <: AbstractDomain, F <: Function}
     return icn(
@@ -62,7 +53,7 @@ function icn(
     discrete = true,
     dom_size = δ(Iterators.flatten(X); discrete),
     metric = :hamming,
-    optimizer = GeneticOptimizer(),
+    optimizer = ICNGeneticOptimizer(),
     param = nothing,
     X_test = nothing,
 ) where {F <: Function}
