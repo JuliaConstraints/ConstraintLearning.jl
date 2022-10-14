@@ -13,7 +13,7 @@ QUBOConstraints = "110b7fcc-6942-4061-a625-86e03d1de7cf"
 ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [compat]
-CompositionalNetworks = "0.4"
+CompositionalNetworks = "0.5"
 ConstraintDomains = "0.3"
 Dictionaries = "0.3"
 Evolutionary = "0.11"
