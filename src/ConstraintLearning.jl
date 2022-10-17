@@ -10,6 +10,12 @@ using Memoization
 using ThreadPools
 
 using QUBOConstraints
+using DataFrames
+using Flux
+using PrettyTables
+
+import Flux.Optimise: update!
+import Flux: params
 
 # SECTION - usings
 export icn
@@ -18,6 +24,9 @@ export qubo
 export ICNConfig
 export ICNGeneticOptimizer
 export ICNOptimizer
+
+export QUBOGradientOptimizer
+export QUBOOptimizer
 
 # SECTION - includes common
 include("common.jl")
@@ -28,6 +37,8 @@ include("icn/genetic.jl")
 include("icn.jl")
 
 # SECTION - QUBO
+include("qubo/base.jl")
+include("qubo/gradient.jl")
 include("qubo.jl")
 
 end

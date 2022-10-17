@@ -1,0 +1,1 @@
+const QUBOOptimizer = QUBOConstraints.AbstractOptimizer
