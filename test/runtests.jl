@@ -3,12 +3,12 @@ using ConstraintLearning
 using QUBOConstraints
 using Test
 
-@testset "CompositionalNetworks.jl" begin
-    println("\nICN: Test for All Different 4×4")
-    domains = [domain([1,2,3,4]) for i in 1:4]
-    compo = icn(domains, allunique)
-    @test compo([1,2,3,3], dom_size = 4) > 0.0
-end
+# @testset "CompositionalNetworks.jl" begin
+#     println("\nICN: Test for All Different 4×4")
+#     domains = [domain([1,2,3,4]) for i in 1:4]
+#     compo = icn(domains, allunique)
+#     @test compo([1,2,3,3], dom_size = 4) > 0.0
+# end
 
 @testset "QUBOConstraints.jl" begin
     println("\nQUBO: Test for All Different 3×3")
@@ -65,7 +65,7 @@ end
         @testset "$(config[:info])" begin
             println("\nTest for $(config[:info])")
             penalty = x -> all_different(x, config[:encoding], config[:binarization])
-            optimizer = GradientDescentOptimizer(; binarization = config[:binarization])
+            optimizer = QUBOGradientOptimizer(; binarization = config[:binarization])
             qubo(config[:train], penalty; optimizer, X_test = config[:test])
             # qubo(config[:train], penalty; optimizer, X_test = config[:test], icn_conf = ICNConfig())
         end
