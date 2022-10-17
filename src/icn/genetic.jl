@@ -22,7 +22,7 @@ function _optimize!(
     pop_size,
     iterations;
     samples=nothing,
-    memoize=false,
+    memoize=false
 )
     inplace = zeros(dom_size, max_icn_length())
     _non_sltns = isnothing(samples) ? non_sltns : rand(non_sltns, samples)
@@ -44,7 +44,7 @@ function _optimize!(
         selection=tournament(2),
         crossover=SPX,
         mutation=flip,
-        mutationRate=1.0,
+        mutationRate=1.0
     )
 
     pop = generate_population(icn, pop_size)
@@ -67,7 +67,7 @@ function optimize!(
     metric,
     pop_size;
     sampler=nothing,
-    memoize=false,
+    memoize=false
 )
     results = Dictionary{BitVector,Int}()
     aux_results = Vector{BitVector}(undef, global_iter)
@@ -88,7 +88,7 @@ function optimize!(
             pop_size,
             iter;
             samples,
-            memoize,
+            memoize
         )
         aux_results[i] = weigths(aux_icn)
     end
@@ -103,7 +103,7 @@ struct ICNGeneticOptimizer <: ICNOptimizer
     local_iter::Int
     memoize::Bool
     pop_size::Int
-    sampler::Union{Nothing, Function}
+    sampler::Union{Nothing,Function}
 end
 
 function ICNGeneticOptimizer(;
@@ -111,7 +111,7 @@ function ICNGeneticOptimizer(;
     local_iter=64,
     memoize=false,
     pop_size=64,
-    sampler=nothing,
+    sampler=nothing
 )
     return ICNGeneticOptimizer(global_iter, local_iter, memoize, pop_size, sampler)
 end
@@ -130,10 +130,10 @@ function CompositionalNetworks.optimize!(
         metric,
         optimizer.pop_size;
         optimizer.sampler,
-        optimizer.memoize,
+        optimizer.memoize
     )
 end
 
-function ICNConfig(; metric = :hamming, optimizer = ICNGeneticOptimizer())
+function ICNConfig(; metric=:hamming, optimizer=ICNGeneticOptimizer())
     return ICNConfig(metric, optimizer)
 end
