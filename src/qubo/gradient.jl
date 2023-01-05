@@ -90,7 +90,7 @@ function train!(Q, X, penalty, η, precision, X_test, oversampling, binarization
     Q[:,:] = round.(precision*Q)
 
     df = make_df(X_test, Q, penalty, binarization, domains)
-    return pretty_table(describe(df[!, [:penalty, :predict, :shifted, :accurate]]))
+    return pretty_table(DataFrames.describe(df[!, [:penalty, :predict, :shifted, :accurate]]))
 end
 
 function train(

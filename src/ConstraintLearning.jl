@@ -2,6 +2,8 @@ module ConstraintLearning
 
 # SECTION - imports
 using ConstraintDomains
+using Constraints
+using LocalSearchSolvers
 
 using CompositionalNetworks
 using Dictionaries
@@ -17,12 +19,15 @@ using PrettyTables
 import Flux.Optimise: update!
 import Flux: params
 
-# SECTION - usings
+import CompositionalNetworks: exclu, nbits_exclu, nbits, layers, compose, as_int
+
+# SECTION - exports
 export icn
 export qubo
 
 export ICNConfig
 export ICNGeneticOptimizer
+export ICNLocalSearchOptimizer
 export ICNOptimizer
 
 export QUBOGradientOptimizer
@@ -34,6 +39,7 @@ include("common.jl")
 # SECTION - ICN
 include("icn/base.jl")
 include("icn/genetic.jl")
+include("icn/cbls.jl")
 include("icn.jl")
 
 # SECTION - QUBO
