@@ -17,6 +17,7 @@ parameter_specific_operations(x; X = nothing) = 0.0
 function CompositionalNetworks.optimize!(
     icn, solutions, non_sltns, dom_size, param, metric, optimizer::ICNLocalSearchOptimizer
 )
+    @info "starting debug opt"
     m = model(; kind = :icn)
     n = nbits(icn)
 
@@ -48,7 +49,8 @@ function CompositionalNetworks.optimize!(
         compo = compose(icn, _w)
         f = composition(compo)
         S = Iterators.flatten((solutions, non_sltns))
-        σ = sum(x -> abs(f(x; X=inplace, param, dom_size) - metric(x, solutions)), S)
+        @debug _w compo f S metric
+        σ = sum(x -> abs(f(x; X=inplace, param, dom_size) - eval(metric)(x, solutions)), S)
         return  σ + regularization(icn) + weigths_bias(_w)
     end
 
@@ -57,7 +59,8 @@ function CompositionalNetworks.optimize!(
     # Create solver and solve
     s = solver(m; options = optimizer.options)
     solve!(s)
+    @info "pool" s.pool best_values(s.pool) best_values(s) s.pool.configurations
 
     # Return best values
-    return best_values(s)
+    return has_solution(s), BitVector(collect(best_values(s)))
 end
