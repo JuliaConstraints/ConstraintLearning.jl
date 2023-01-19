@@ -28,7 +28,7 @@ function make_training_sets(X, penalty, p, ds)
 end
 
 # REVIEW - Is it correct? Make a CI test
-function make_training_sets(X, penalty::Vector{T}, _, _) where {T <: Real}
+function make_training_sets(X, penalty::Vector{T}, _) where {T <: Real}
     solutions = Set{Vector{Int}}()
     non_sltns = Set{Vector{Int}}()
 
@@ -46,10 +46,10 @@ function make_set_penalty(X, X̅)
     return X_train, penalty
 end
 
-make_set_penalty(X, X̅, _, ::Nothing) = make_set_penalty(X, X̅)
+make_set_penalty(X, X̅, ::Nothing) = make_set_penalty(X, X̅)
 
-function make_set_penalty(X, X̅, param, icn_conf)
-    penalty = icn(X, X̅; param, metric = icn_conf.metric, optimizer = icn.optimizer)
+function make_set_penalty(X, X̅, icn_conf; parameters...)
+    penalty = icn(X, X̅; metric = icn_conf.metric, optimizer = icn.optimizer, parameters...)
     X_train = union(X, X̅)
     return X_train, penalty
 end
