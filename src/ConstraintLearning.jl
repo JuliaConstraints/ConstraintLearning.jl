@@ -9,6 +9,8 @@ using CompositionalNetworks
 using Dictionaries
 using Evolutionary
 using Memoization
+using TestItemRunner
+using TestItems
 using ThreadPools
 
 using QUBOConstraints

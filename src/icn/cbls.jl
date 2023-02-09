@@ -67,3 +67,12 @@ function CompositionalNetworks.optimize!(
 
     return best, Dictionary{BitVector, Int}([best], [1])
 end
+
+@testitem "ICN: CBLS" tags = [:icn, :cbls] default_imports=false begin
+    using ConstraintDomains
+    using ConstraintLearning
+
+    domains = [domain([1,2,3,4]) for i in 1:4]
+    compo = icn(domains, allunique; optimizer = ICNLocalSearchOptimizer())
+    # @test compo([1,2,3,3], dom_size = 4) > 0.0
+end
