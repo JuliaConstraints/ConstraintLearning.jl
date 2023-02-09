@@ -1,7 +1,7 @@
 name = "ConstraintLearning"
 uuid = "4bd09668-9077-4be7-adc9-6307a490e6df"
 authors = ["azzaare <jf@baffier.fr> and contributors"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 CompositionalNetworks = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
