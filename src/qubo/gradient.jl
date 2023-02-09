@@ -5,6 +5,11 @@ struct QUBOGradientOptimizer <: QUBOConstraints.AbstractOptimizer
     oversampling::Bool
 end
 
+"""
+    QUBOGradientOptimizer(; kargs...)
+
+A QUBO optimizer based on gradient descent. Defaults TBW
+"""
 function QUBOGradientOptimizer(;
     binarization = :one_hot,
     η = .001,
@@ -14,11 +19,25 @@ function QUBOGradientOptimizer(;
     return QUBOGradientOptimizer(binarization, η, precision, oversampling)
 end
 
+"""
+    predict(x, Q)
 
+Return the predictions given by `Q` for a given configuration `x`.
+"""
 predict(x, Q) = transpose(x) * Q * x
 
-loss(x, y, Q) = (predict(x, Q) .-y).^2
+"""
+    loss(x, y, Q)
 
+Loss of the prediction given by `Q`, a training set `y`, and a given configuration `x`.
+"""
+loss(x, y, Q) = (predict(x, Q) .- y).^2
+
+"""
+    make_df(X, Q, penalty, binarization, domains)
+
+DataFrame arrangement to ouput some basic evaluation of a matrix `Q`.
+"""
 function make_df(X, Q, penalty, binarization, domains)
 	df = DataFrame()
 	for (i,x) in enumerate(X)
@@ -55,6 +74,11 @@ function make_df(X, Q, penalty, binarization, domains)
 	return df
 end
 
+"""
+    preliminaries(args)
+
+Preliminaries to the training process in a `QUBOGradientOptimizer` run.
+"""
 function preliminaries(X, domains, binarization)
     if binarization==:none
         n = length(first(X))
@@ -71,6 +95,11 @@ function preliminaries(X, _)
     return X, zeros(n,n)
 end
 
+"""
+    train!(Q, X, penalty, η, precision, X_test, oversampling, binarization, domains)
+
+Training inner method.
+"""
 function train!(Q, X, penalty, η, precision, X_test, oversampling, binarization, domains)
     θ = params(Q)
     try
@@ -93,6 +122,11 @@ function train!(Q, X, penalty, η, precision, X_test, oversampling, binarization
     return pretty_table(DataFrames.describe(df[!, [:penalty, :predict, :shifted, :accurate]]))
 end
 
+"""
+    train(X, penalty[, d]; optimizer = QUBOGradientOptimizer(), X_test = X)
+
+Learn a QUBO matrix on training set `X` for a constraint defined by `penalty` with optional domain information `d`. By default, it uses a `QUBOGradientOptimizer` and `X` as a testing set.
+"""
 function train(
     X,
     penalty,
