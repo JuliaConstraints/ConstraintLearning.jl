@@ -108,6 +108,11 @@ struct ICNGeneticOptimizer <: ICNOptimizer
     sampler::Union{Nothing, Function}
 end
 
+"""
+    ICNGeneticOptimizer(; kargs...)
+
+Default constructor to learn an ICN through a Genetic Algorithm. Default `kargs` TBW.
+"""
 function ICNGeneticOptimizer(;
     global_iter=Threads.nthreads(),
     local_iter=64,
@@ -118,6 +123,11 @@ function ICNGeneticOptimizer(;
     return ICNGeneticOptimizer(global_iter, local_iter, memoize, pop_size, sampler)
 end
 
+"""
+    CompositionalNetworks.optimize!(icn, solutions, non_sltns, dom_size, metric, optimizer::ICNGeneticOptimizer; parameters...)
+
+Extends the `optimize!` method to `ICNGeneticOptimizer`.
+"""
 function CompositionalNetworks.optimize!(
     icn, solutions, non_sltns, dom_size, metric, optimizer::ICNGeneticOptimizer;
     parameters...
@@ -137,6 +147,22 @@ function CompositionalNetworks.optimize!(
     )
 end
 
+"""
+    ICNConfig(; metric = :hamming, optimizer = ICNGeneticOptimizer())
+
+Constructor for `ICNConfig`. Defaults to hamming metric using a genetic algorithm.
+"""
 function ICNConfig(; metric = :hamming, optimizer = ICNGeneticOptimizer())
     return ICNConfig(metric, optimizer)
+end
+
+
+@testitem "ICN: Genetic" tags = [:icn, :genetic] default_imports=false begin
+    using ConstraintDomains
+    using ConstraintLearning
+    using Test
+
+    domains = [domain([1,2,3,4]) for i in 1:4]
+    compo = icn(domains, allunique)
+    @test compo([1,2,3,3], dom_size = 4) > 0.0
 end

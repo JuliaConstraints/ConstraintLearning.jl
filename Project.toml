@@ -1,7 +1,7 @@
 name = "ConstraintLearning"
 uuid = "4bd09668-9077-4be7-adc9-6307a490e6df"
 authors = ["azzaare <jf@baffier.fr> and contributors"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 CompositionalNetworks = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
@@ -15,22 +15,26 @@ LocalSearchSolvers = "2b10edaa-728d-4283-ac71-07e312d6ccf3"
 Memoization = "6fafb56a-5788-4b4e-91ca-c0cea6611c73"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 QUBOConstraints = "110b7fcc-6942-4061-a625-86e03d1de7cf"
+TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
+TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [compat]
 CompositionalNetworks = "0.5"
 ConstraintDomains = "0.3"
 Constraints = "0.4"
-DataFrames = "1.4"
+DataFrames = "1"
 Dictionaries = "0.3"
 Evolutionary = "0.11"
 Flux = "0.13"
 LocalSearchSolvers = "0.4"
-Memoization = "0.1"
+Memoization = "0.2"
 PrettyTables = "2"
 QUBOConstraints = "0.2"
+TestItemRunner = "0.2"
+TestItems = "0.1"
 ThreadPools = "2"
-julia = "1.6"
+julia = "1.8"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

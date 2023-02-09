@@ -1,3 +1,8 @@
+"""
+    icn(X,X̅; kargs..., parameters...)
+
+TBW
+"""
 function icn(
     X,
     X̅;

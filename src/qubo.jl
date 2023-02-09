@@ -1,3 +1,8 @@
+"""
+    qubo(X,X̅; kargs..., parameters...)
+
+TBW
+"""
 function qubo(
     X,
     penalty::Function,
