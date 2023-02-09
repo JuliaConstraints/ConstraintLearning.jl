@@ -1,6 +1,6 @@
+authors = ["azzaare <jf@baffier.fr> and contributors"]
 name = "ConstraintLearning"
 uuid = "4bd09668-9077-4be7-adc9-6307a490e6df"
-authors = ["azzaare <jf@baffier.fr> and contributors"]
 version = "0.1.6"
 
 [deps]
