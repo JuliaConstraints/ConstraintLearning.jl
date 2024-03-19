@@ -1,7 +1,7 @@
 name = "ConstraintLearning"
 uuid = "4bd09668-9077-4be7-adc9-6307a490e6df"
 authors = ["azzaare <jf@baffier.fr> and contributors"]
-version = "0.1.6"
+version = "0.1.7"
 
 [deps]
 CompositionalNetworks = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
@@ -24,10 +24,9 @@ CompositionalNetworks = "0.5"
 ConstraintDomains = "0.3"
 Constraints = "0.5"
 DataFrames = "1"
-Dictionaries = "0.3"
+Dictionaries = "0.4"
 Evolutionary = "0.11"
-Flux = "0.13"
-LocalSearchSolvers = "0.4"
+Flux = "0.14"
 Memoization = "0.2"
 PrettyTables = "2"
 QUBOConstraints = "0.2"
