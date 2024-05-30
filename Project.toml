@@ -27,6 +27,7 @@ DataFrames = "1"
 Dictionaries = "0.4"
 Evolutionary = "0.11"
 Flux = "0.14"
+LocalSearchSolvers = "0.4"
 Memoization = "0.2"
 PrettyTables = "2"
 QUBOConstraints = "0.2"
@@ -36,7 +37,8 @@ ThreadPools = "2"
 julia = "1.8"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Aqua", "Test"]
