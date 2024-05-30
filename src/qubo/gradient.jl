@@ -36,7 +36,7 @@ loss(x, y, Q) = (predict(x, Q) .- y) .^ 2
 """
     make_df(X, Q, penalty, binarization, domains)
 
-DataFrame arrangement to ouput some basic evaluation of a matrix `Q`.
+DataFrame arrangement to output some basic evaluation of a matrix `Q`.
 """
 function make_df(X, Q, penalty, binarization, domains)
     df = DataFrame()
