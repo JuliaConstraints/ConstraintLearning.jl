@@ -41,7 +41,7 @@ function make_training_sets(X, penalty, p, ds)
 
     foreach(
         c -> (cv = collect(c); push!(f(cv; param = p) ? solutions : non_sltns, cv)),
-        X,
+        X
     )
 
     return solutions, non_sltns
@@ -54,7 +54,7 @@ function make_training_sets(X, penalty::Vector{T}, _) where {T <: Real}
 
     foreach(
         (c, p) -> (cv = collect(c); push!(p ? non_sltns : solutions, cv)),
-        Iterators.zip(X, penalty),
+        Iterators.zip(X, penalty)
     )
 
     return solutions, non_sltns
@@ -66,7 +66,7 @@ end
 Return a penalty function when the training set is already split into a pair of solutions `X` and non solutions `X̅`.
 """
 function make_set_penalty(X, X̅)
-    penalty = x -> x ∈ X ? 1. : x ∈ X̅ ? 0. : 0.5
+    penalty = x -> x ∈ X ? 1.0 : x ∈ X̅ ? 0.0 : 0.5
     X_train = union(X, X̅)
     return X_train, penalty
 end

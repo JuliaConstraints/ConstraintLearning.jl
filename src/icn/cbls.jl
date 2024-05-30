@@ -40,7 +40,8 @@ parameter_specific_operations(x; X = nothing) = 0.0
 Extends the `optimize!` method to `ICNLocalSearchOptimizer`.
 """
 function CompositionalNetworks.optimize!(
-    icn, solutions, non_sltns, dom_size, metric, optimizer::ICNLocalSearchOptimizer; parameters...
+        icn, solutions, non_sltns, dom_size, metric,
+        optimizer::ICNLocalSearchOptimizer; parameters...
 )
     @debug "starting debug opt"
     m = model(; kind = :icn)
@@ -75,8 +76,11 @@ function CompositionalNetworks.optimize!(
         f = composition(compo)
         S = Iterators.flatten((solutions, non_sltns))
         @debug _w compo f S metric
-        σ = sum(x -> abs(f(x; X=inplace, dom_size, parameters...) - eval(metric)(x, solutions)), S)
-        return  σ + regularization(icn) + weigths_bias(_w)
+        σ = sum(
+            x -> abs(f(x; X = inplace, dom_size, parameters...) -
+                     eval(metric)(x, solutions)),
+            S)
+        return σ + regularization(icn) + weights_bias(_w)
     end
 
     objective!(m, fitness)
@@ -88,16 +92,16 @@ function CompositionalNetworks.optimize!(
 
     # Return best values
     best = BitVector(collect(best_values(s)))
-    weigths!(icn, best)
+    weights!(icn, best)
 
     return best, Dictionary{BitVector, Int}([best], [1])
 end
 
-@testitem "ICN: CBLS" tags = [:icn, :cbls] default_imports=false begin
+@testitem "ICN: CBLS" tags=[:icn, :cbls] default_imports=false begin
     using ConstraintDomains
     using ConstraintLearning
 
-    domains = [domain([1,2,3,4]) for i in 1:4]
+    domains = [domain([1, 2, 3, 4]) for i in 1:4]
     compo = icn(domains, allunique; optimizer = ICNLocalSearchOptimizer())
     # @test compo([1,2,3,3], dom_size = 4) > 0.0
 end

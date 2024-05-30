@@ -4,14 +4,14 @@
 TBW
 """
 function icn(
-    X,
-    X̅;
-    discrete = true,
-    dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅); discrete),
-    metric = :hamming,
-    optimizer = ICNGeneticOptimizer(),
-    X_test = nothing,
-    parameters...
+        X,
+        X̅;
+        discrete = true,
+        dom_size = δ(Iterators.flatten(X), Iterators.flatten(X̅); discrete),
+        metric = :hamming,
+        optimizer = ICNGeneticOptimizer(),
+        X_test = nothing,
+        parameters...
 )
     lc = learn_compose(
         X,
@@ -26,15 +26,15 @@ function icn(
 end
 
 function icn(
-    domains::Vector{D},
-    penalty::F;
-    configurations = nothing,
-    discrete = true,
-    dom_size = nothing,
-    metric=:hamming,
-    optimizer = ICNGeneticOptimizer(),
-    X_test = nothing,
-    parameters...
+        domains::Vector{D},
+        penalty::F;
+        configurations = nothing,
+        discrete = true,
+        dom_size = nothing,
+        metric = :hamming,
+        optimizer = ICNGeneticOptimizer(),
+        X_test = nothing,
+        parameters...
 ) where {D <: AbstractDomain, F <: Function}
     if isnothing(configurations)
         configurations = explore(domains, penalty; parameters...)
@@ -44,7 +44,7 @@ function icn(
         dom_size = δ(
             Iterators.flatten(configurations[1]),
             Iterators.flatten(configurations[2]);
-            discrete,
+            discrete
         )
     end
 
@@ -61,14 +61,14 @@ function icn(
 end
 
 function icn(
-    X,
-    penalty::F;
-    discrete = true,
-    dom_size = δ(Iterators.flatten(X); discrete),
-    metric = :hamming,
-    optimizer = ICNGeneticOptimizer(),
-    X_test = nothing,
-    parameters...
+        X,
+        penalty::F;
+        discrete = true,
+        dom_size = δ(Iterators.flatten(X); discrete),
+        metric = :hamming,
+        optimizer = ICNGeneticOptimizer(),
+        X_test = nothing,
+        parameters...
 ) where {F <: Function}
     solutions, non_sltns = make_training_sets(X, penalty, dom_size; parameters...)
     return icn(
