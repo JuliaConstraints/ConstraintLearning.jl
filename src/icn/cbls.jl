@@ -91,8 +91,13 @@ function CompositionalNetworks.optimize!(
     @debug "pool" s.pool best_values(s.pool) best_values(s) s.pool.configurations
 
     # Return best values
-    best = BitVector(collect(best_values(s)))
-    weights!(icn, best)
+
+    if has_solution(s)
+        weights!(icn, BitVector(collect(best_values(s))))
+    else
+        CompositionalNetworks.generate_weights(icn)
+    end
+    best = weights(icn)
 
     return best, Dictionary{BitVector, Int}([best], [1])
 end
