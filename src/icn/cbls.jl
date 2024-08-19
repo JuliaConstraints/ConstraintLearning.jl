@@ -25,7 +25,7 @@ end
 
 Constraint ensuring that at least one operation is selected.
 """
-no_empty_layer(x; X = nothing) = max(0, 1 - sum(x))
+no_empty_layer(x; X = nothing) = max(0.0, 1.0 - sum(x))
 
 """
     parameter_specific_operations(x; X = nothing)
@@ -88,11 +88,11 @@ function CompositionalNetworks.optimize!(
     # Create solver and solve
     s = solver(m; options = optimizer.options)
     solve!(s)
-    @debug "pool" s.pool best_values(s.pool) best_values(s) s.pool.configurations
+    # @info "pool" s.pool best_values(s.pool) best_values(s) s.pool.configurations has_solution(s.pool) has_solution(s)
 
     # Return best values
-
     if has_solution(s)
+        # @info "ICN optimization finished with a solution"
         weights!(icn, BitVector(collect(best_values(s))))
     else
         CompositionalNetworks.generate_weights(icn)
